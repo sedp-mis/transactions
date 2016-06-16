@@ -1,6 +1,6 @@
 <?php
 
-namespace SedpMis\Transactions;
+namespace SedpMis\Transactions\Models;
 
 class Transaction extends \Eloquent
 {
