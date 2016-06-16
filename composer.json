@@ -1,0 +1,21 @@
+{
+    "name": "sedp-mis/transactions",
+    "description": "Business Transactions",
+    "keywords": ["transactions", "accounting", "business", "business transactions"],
+    "license": "SEDP",
+    "authors": [
+        {
+            "name": "Arjon Jason Castro",
+            "email": "ajcastro29@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "SedpMis\\Transactions\\": "src"
+        }
+    },
+    "minimum-stability": "stable"
+}
