@@ -320,4 +320,15 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
 
         $transaction->save();
     }
+
+    public function withDocumentTypes(array $documentTypeIds)
+    {
+        $this->with([
+            'documents.documentType' => function ($query) use ($documentTypeIds) {
+                $query->whereIn('id', $documentTypeIds);
+            }
+        ]);
+
+        return $this;
+    }
 }
