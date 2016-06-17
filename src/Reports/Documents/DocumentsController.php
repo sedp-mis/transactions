@@ -11,14 +11,14 @@ abstract class DocumentsController extends \Illuminate\Routing\Controller
     /**
      * Repository for documentType's signatories.
      *
-     * @var
+     * @var \SedpMis\Transactions\Repositories\DocumentTypeSignatory\DocumentTypeSignatoryRepositoryInterface
      */
     protected $documentTypeSignatory;
 
     /**
      * Transaction repository.
      *
-     * @var [type]
+     * @var \SedpMis\Transactions\Repositories\Transaction\TransactionRepositoryInterface
      */
     protected $transaction;
 
@@ -48,12 +48,12 @@ abstract class DocumentsController extends \Illuminate\Routing\Controller
     public function show($transactionId)
     {
         $transaction = $this->transaction->withDocumentTypes($this->documentTypeIds)
-            ->with([
+            ->with(array_merge([
                 'menu',
                 'documents.documentApprovals.signatoryAction',
                 'documents.documentApprovals.user', 
                 'transactionApprovals'
-            ])
+            ], $this->eagerLoadWithTransaction))
             ->find($transactionId);
 
         $signatories = $this->documentTypeSignatory->findSignatoriesByTransaction(
