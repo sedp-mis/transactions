@@ -4,11 +4,11 @@ namespace SedpMis\Transactions\Repositories\Transaction;
 
 use SedpMis\Transactions\Repositories\Signatory\SignatoryRepositoryInterface;
 use SedpMis\BaseRepository\BaseBranchRepositoryEloquent;
-use SedpMis\BaseRepository\BaseBranchRepositoryInterface;
+use SedpMis\BaseRepository\RepositoryInterface;
 use SedpMis\Transactions\Models\Transaction;
 use SedpMis\Transactions\Models\SignatorySet;
 
-class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent implements BaseBranchRepositoryInterface
+class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent implements RepositoryInterface
 {
     /**
      * Signatory repository.
