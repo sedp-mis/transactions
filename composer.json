@@ -1,6 +1,6 @@
 {
     "name": "sedp-mis/transactions",
-    "description": "A business  and accounting transactions system which support transaction documents, queueing, approvals and more about business and accounting transactions management.",
+    "description": "A business and accounting transactions management system.",
     "keywords": ["transactions", "accounting", "business", "business transactions"],
     "license": "SEDP",
     "authors": [
