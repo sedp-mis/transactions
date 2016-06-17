@@ -1,12 +1,12 @@
 <?php
 
-namespace SedpMis\Transactions\Reports\Documents;
+namespace SedpMis\Transactions\Reports\BaseDocument;
 
 use SedpMis\Transactions\Repositories\DocumentTypeSignatory\DocumentTypeSignatoryRepositoryInterface;
 use SedpMis\Transactions\Repositories\Transaction\TransactionRepositoryInterface;
 use SedpMis\Transactions\Helpers\DocumentSignatoryHelper;
 
-abstract class DocumentsController extends \Illuminate\Routing\Controller
+abstract class BaseDocumentController extends \Illuminate\Routing\Controller
 {
     /**
      * Repository for documentType's signatories.

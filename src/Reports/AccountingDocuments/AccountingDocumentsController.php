@@ -2,10 +2,10 @@
 
 namespace SedpMis\Transactions\Reports\AccountingDocuments;
 
-use SedpMis\Transactions\Reports\Documents\DocumentsController;
+use SedpMis\Transactions\Reports\BaseDocument\BaseDocumentController;
 use SedpMis\Transactions\Models\DocumentType;
 
-class AccountingDocumentsController extends DocumentsController
+class AccountingDocumentsController extends BaseDocumentController
 {
     /**
      * Document type codes for this.
