@@ -8,26 +8,11 @@ class JournalHead extends \Eloquent
 
     public function document()
     {
-        return $this->belongsTo('Document');
-    }
-
-    public function payee()
-    {
-        return $this->hasOne('Payee');
+        return $this->belongsTo(Document::class);
     }
 
     public function journalEntries()
     {
-        return $this->hasMany('JournalEntry');
-    }
-
-    public function collectionSheets()
-    {
-        return $this->hasMany('CollectionSheet');
-    }
-
-    public function check()
-    {
-        return $this->hasOne('Check');
+        return $this->hasMany(JournalEntry::class);
     }
 }

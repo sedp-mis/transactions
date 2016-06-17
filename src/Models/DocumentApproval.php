@@ -12,11 +12,11 @@ class DocumentApproval extends DocumentSignatory
 
     public function user()
     {
-        return $this->belongsTo('User');
+        return $this->belongsTo(User::class);
     }
 
     public function signatoryAction()
     {
-        return $this->belongsTo('SignatoryAction');
+        return $this->belongsTo(SignatoryAction::class);
     }
 }

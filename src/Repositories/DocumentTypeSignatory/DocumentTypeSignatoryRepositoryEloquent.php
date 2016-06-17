@@ -1,11 +1,10 @@
 <?php
 
-namespace SedpMis\Transactions\Repositories\MenuSignatory;
+namespace SedpMis\Transactions\Repositories\DocumentTypeSignatory;
 
-use SedpMis\Transactions\Repositories\Signatory\SignatoryRepositoryEloquent;
 use SedpMis\Transactions\Models\Signatory;
 
-class DocumentTypeSignatoryRepositoryEloquent
+class DocumentTypeSignatoryRepositoryEloquent implements DocumentTypeSignatoryRepositoryInterface
 {
     public function findSignatoriesByTransaction($transaction, $documentTypes, $hierarchy = 1)
     {

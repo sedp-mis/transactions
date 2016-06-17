@@ -1,6 +1,6 @@
 <?php
 
-namespace SedpMis\Transactions\Helper;
+namespace SedpMis\Transactions\Helpers;
 
 use Illuminate\Support\Facades\Session;
 

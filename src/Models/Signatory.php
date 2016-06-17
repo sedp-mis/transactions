@@ -8,7 +8,7 @@ class Signatory extends \Eloquent
 {
     public function user()
     {
-        return $this->belongsTo('User');
+        return $this->belongsTo(User::class);
     }
 
     public function userByJob($branchId)
@@ -20,12 +20,17 @@ class Signatory extends \Eloquent
         return User::findByBranchJob($branchId, $this->job_id);
     }
 
+    public function signatoryAction()
+    {
+        return $this->belongsTo(SignatoryAction::class);
+    }
+
     public function scopeForDocumentTypesWithMenu($query, array $documentTypeIds, $menuId)
     {
         return $query->join('transaction_document_signatories', function ($join) use ($documentTypeIds, $menuId) {
             $join
                 ->on('transaction_document_signatories.signatory_id', '=', 'signatories.id')
-                ->on('transaction_document_signatories.menu_id', '=', $menuId)
+                ->on('transaction_document_signatories.transaction_menu_id', '=', DB::raw($menuId))
                 ->on('transaction_document_signatories.document_type_id', 'in', DB::raw('('.join(',', $documentTypeIds).')'));
         });
     }

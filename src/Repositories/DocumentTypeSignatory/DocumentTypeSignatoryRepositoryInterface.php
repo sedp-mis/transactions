@@ -1,6 +1,6 @@
 <?php
 
-namespace SedpMis\Transactions\Repositories\MenuSignatory;
+namespace SedpMis\Transactions\Repositories\DocumentTypeSignatory;
 
 interface DocumentTypeSignatoryRepositoryInterface
 {

@@ -15,6 +15,6 @@ class JournalHeadRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
 
     public function findByDocumentIds(array $documentIds)
     {
-        return $this->model->whereIn('document_id', $documentIds)->get();
+        return $this->eagerLoadRelations()->whereIn('document_id', $documentIds)->get();
     }
 }

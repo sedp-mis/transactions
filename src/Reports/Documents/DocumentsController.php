@@ -2,17 +2,12 @@
 
 namespace SedpMis\Transactions\Reports\Documents;
 
-use SedpMis\Transactions\Helper\DocumentSignatoryHelper;
+use SedpMis\Transactions\Repositories\DocumentTypeSignatory\DocumentTypeSignatoryRepositoryInterface;
+use SedpMis\Transactions\Repositories\Transaction\TransactionRepositoryInterface;
+use SedpMis\Transactions\Helpers\DocumentSignatoryHelper;
 
 abstract class DocumentsController extends \Illuminate\Routing\Controller
 {
-    /**
-     * Accounting document repository.
-     *
-     * @var [type]
-     */
-    protected $document;
-
     /**
      * Repository for documentType's signatories.
      *
@@ -28,23 +23,31 @@ abstract class DocumentsController extends \Illuminate\Routing\Controller
     protected $transaction;
 
     /**
-     * Document type categories for the report
+     * Document type Ids for the report
      *
      * @var array
      */
     protected $documentTypeIds = [];
 
+    /**
+     * Eagerload relations with transaction.
+     *
+     * @var array
+     */
+    protected $eagerLoadWithTransaction = [];
 
-    public function __construct($document, $documentTypeSignatory, $transaction)
-    {
-       $this->document      = $document; 
+
+    public function __construct(
+        DocumentTypeSignatoryRepositoryInterface $documentTypeSignatory,
+        TransactionRepositoryInterface $transaction
+    ) {
        $this->documentTypeSignatory = $documentTypeSignatory;
-       $this->transaction   = $transaction;
+       $this->transaction           = $transaction;
     }
 
     public function show($transactionId)
     {
-        $transaction = $this->transaction->withDocumentTypes($this->documentTypeIds())
+        $transaction = $this->transaction->withDocumentTypes($this->documentTypeIds)
             ->with([
                 'menu',
                 'documents.documentApprovals.signatoryAction',
@@ -55,18 +58,13 @@ abstract class DocumentsController extends \Illuminate\Routing\Controller
 
         $signatories = $this->documentTypeSignatory->findSignatoriesByTransaction(
             $transaction, 
-            $transaction->documents->pluck('documentType'),
+            collection($transaction->documents->pluck('documentType')),
             $transaction->transactionApprovals->count() + 1
         );
 
         $transaction->documents = DocumentSignatoryHelper::setDocumentSignatories($transaction->documents, $signatories);
 
-        $this->loadReport($transaction);
-    }
-
-    public function documentTypeIds()
-    {
-        return $this->documentTypeIds;
+        $this->loadReportPdf($transaction);
     }
 
     abstract public function loadReportPdf($transaction);

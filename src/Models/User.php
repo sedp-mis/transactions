@@ -2,7 +2,7 @@
 
 namespace SedpMis\Transactions\Models;
 
-class User extends Eloquent implements UserInterface, RemindableInterface
+class User extends \Eloquent
 {
     public function getFullNameAttribute()
     {
