@@ -28,5 +28,10 @@ class Transaction extends \Eloquent
     public function transactionApprovals()
     {
         return $this->hasMany(TransactionApproval::class);
-    }    
+    }
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
 }

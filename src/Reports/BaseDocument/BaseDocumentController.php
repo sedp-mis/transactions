@@ -49,6 +49,7 @@ abstract class BaseDocumentController extends \Illuminate\Routing\Controller
     {
         $transaction = $this->transaction->withDocumentTypes($this->documentTypeIds)
             ->with(array_merge([
+                'branch',
                 'menu',
                 'documents.documentApprovals.signatoryAction',
                 'documents.documentApprovals.user', 
