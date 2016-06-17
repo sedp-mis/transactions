@@ -57,13 +57,16 @@ abstract class BaseDocumentController extends \Illuminate\Routing\Controller
             ], $this->eagerLoadWithTransaction))
             ->find($transactionId);
 
-        $signatories = $this->documentTypeSignatory->findSignatoriesByTransaction(
-            $transaction, 
-            collection($transaction->documents->pluck('documentType')),
-            $transaction->transactionApprovals->count() + 1
-        );
+        // If transaction is still in queue, signatories from settings will retrieved and set them as signatories for the documents
+        if ($transaction->status == 'Q') {
+            $signatories = $this->documentTypeSignatory->findSignatoriesByTransaction(
+                $transaction, 
+                collection($transaction->documents->pluck('documentType')),
+                $transaction->transactionApprovals->count() + 1
+            );
 
-        $transaction->documents = DocumentSignatoryHelper::setDocumentSignatories($transaction->documents, $signatories);
+            $transaction->documents = DocumentSignatoryHelper::setDocumentSignatories($transaction->documents, $signatories);
+        }
 
         $this->loadReportPdf($transaction);
     }
