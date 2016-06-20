@@ -19,4 +19,9 @@ class DocumentApproval extends DocumentSignatory
     {
         return $this->belongsTo(SignatoryAction::class);
     }
+
+    public function job()
+    {
+        return $this->belongsTo(Job::class);
+    }
 }
