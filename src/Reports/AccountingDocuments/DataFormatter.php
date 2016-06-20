@@ -61,8 +61,7 @@ class DataFormatter
                     'mname'       => $approval->user->mname,
                     'lname'       => $approval->user->lname,
                     'full_name'   => $approval->user->full_name,
-                    'sign_job'    => $approval->user->job->name,
-                    // 'sign_job'    => $approval->job->name, FIXME: use this instead
+                    'sign_job'    => $approval->job->name,
                     'sign_action' => $approval->signatoryAction->name,
                     'is_signed'   => 1,
                 ];
