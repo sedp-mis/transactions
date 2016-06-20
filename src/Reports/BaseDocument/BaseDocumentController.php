@@ -52,7 +52,8 @@ abstract class BaseDocumentController extends \Illuminate\Routing\Controller
                 'branch',
                 'menu',
                 'documents.documentApprovals.signatoryAction',
-                'documents.documentApprovals.user', 
+                'documents.documentApprovals.user',
+                'documents.documentApprovals.job',
                 'documents.documentType', 
                 'transactionApprovals'
             ], $this->eagerLoadWithTransaction))
