@@ -4,6 +4,8 @@ namespace SedpMis\Transactions\Models;
 
 class User extends \Eloquent
 {
+    protected $appends = ['full_name'];
+
     public function getFullNameAttribute()
     {
         return "{$this->lname}, {$this->fname} {$this->mname}";

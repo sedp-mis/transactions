@@ -10,4 +10,9 @@ class JournalEntry extends \Eloquent {
         'debit' => 'float, *',
         'credit' => 'float, *',
     ];
+
+    public function account()
+    {
+        return $this->belongsTo(Account::class);
+    }
 }
