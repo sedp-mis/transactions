@@ -36,7 +36,7 @@ class AccountingDocumentsController extends BaseDocumentController
         }
 
         // // Set pdf signatories data
-        // $pdf->setSignsData($dataFormat->signsData());
+        $pdf->setSignsData($dataFormat->signsData());
         
         $pdf->showReport();
     }

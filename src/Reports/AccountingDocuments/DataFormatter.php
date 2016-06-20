@@ -51,6 +51,25 @@ class DataFormatter
 
     public function signsData()
     {
-        return [];
+        $rows = [];
+        foreach ($this->transaction->documents as $ref => $document) {
+            $approvals = [];
+            foreach ($document->documentApprovals as $approval) {
+                $approvals[] = [
+                    'user_id'     => $approval->user->id,
+                    'fname'       => $approval->user->fname,
+                    'mname'       => $approval->user->mname,
+                    'lname'       => $approval->user->lname,
+                    'full_name'   => $approval->user->full_name,
+                    'sign_job'    => $approval->user->job->name,
+                    // 'sign_job'    => $approval->job->name, FIXME: use this instead
+                    'sign_action' => $approval->signatoryAction->name,
+                    'is_signed'   => 1,
+                ];
+            }
+            $rows[] = $approvals;
+        }
+
+        return $rows;
     }
 }
