@@ -13,7 +13,7 @@
         "php": ">=5.4.0",
         "laravel/framework": "4.2.11",
         "sedp-mis/base-repository": "dev-master",
-        "sedp-mis/lib": "dev-master"
+        "sedp-mis/lib": "1.*"
     },
     "require-dev": {
         "mockery/mockery": "~0.9",
