@@ -12,8 +12,8 @@
     "require": {
         "php": ">=5.4.0",
         "laravel/framework": "4.2.11",
-        "sedp-mis/base-repository": "0.*",
-        "sedp-mis/lib": "1.*"
+        "sedp-mis/base-repository": "1.0.x-dev",
+        "sedp-mis/lib": "2.*"
     },
     "require-dev": {
         "mockery/mockery": "~0.9",
