@@ -2,8 +2,8 @@
 
 namespace SedpMis\Transactions\Repositories\Signatory;
 
-use Abstractions\Repository\RepositoryInterface;
-use Abstractions\Repository\BaseRepositoryEloquent;
+use SedpMis\BaseRepository\RepositoryInterface;
+use SedpMis\BaseRepository\BaseBranchRepositoryEloquent;
 use SedpMis\Transactions\Models\Interfaces\SignatoryInterface;
 
 class SignatoryRepositoryEloquent extends BaseRepositoryEloquent implements SignatoryRepositoryInterface, RepositoryInterface

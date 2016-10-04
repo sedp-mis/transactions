@@ -4,6 +4,8 @@ namespace SedpMis\Transactions\ServiceProviders;
 
 class ModelsProvider extends \Illuminate\Support\ServiceProvider
 {
+    protected $modelNamespace = 'SedpMis\\Transactions\\Models\\';
+
     public function register()
     {
         $models = [
@@ -14,7 +16,7 @@ class ModelsProvider extends \Illuminate\Support\ServiceProvider
         foreach ($models as $model) {
             $this->app->bind(
                 "SedpMis\\Transactions\\Models\\Interfaces\\{$model}Interface",
-                "SedpMis\\Transactions\\Models\\{$model}"
+                "{$this->modelNamespace}{$model}"
             );
         }
     }
