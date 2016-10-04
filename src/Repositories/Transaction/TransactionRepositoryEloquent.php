@@ -279,9 +279,6 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     {
         $signatory = $signatory ?: $transaction->curSignatory;
 
-        $this->createTransactionApproval($transaction, $signatory, 'A', $remarks);
-        $this->createDocumentApprovals($transaction, $signatory);
-
         $nextSignatory = $this->signatory->nextSignatory($signatory->id);
 
         if ($nextSignatory) {
@@ -291,8 +288,15 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
             $transaction->save();
         } else {
             $transaction->status = 'A';
-            $transaction->save();
-            // Fire event for final approved of transaction
+        }
+
+        $transaction->save();
+
+        $this->createTransactionApproval($transaction, $signatory, 'A', $remarks);
+        $this->createDocumentApprovals($transaction, $signatory);
+
+        // Fire event for final approved of transaction
+        if ($transaction->status === 'A') {
             Event::fire("transaction_approval.{$transaction->transaction_menu_id}.approved", [$transaction]);
         }
     }
@@ -309,12 +313,12 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     {
         $signatory = $signatory ?: $transaction->curSignatory;
 
-        $this->createTransactionApproval($transaction, $signatory, 'R', $remarks);
-
         $transaction->current_signatory      = $signatory->id;
         $transaction->current_user_signatory = $signatory->user->id;
         $transaction->status                 = 'R';
         $transaction->save();
+
+        $this->createTransactionApproval($transaction, $signatory, 'R', $remarks);
 
         // Fire event for rejected of transaction
         Event::fire("transaction_approval.{$transaction->transaction_menu_id}.rejected", [$transaction]);
@@ -332,8 +336,6 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     {
         $signatory = $signatory ?: $transaction->curSignatory;
 
-        $this->createTransactionApproval($transaction, $signatory, 'H', $remarks);
-
         $transaction->status = 'Q';
         if ($transaction->current_user_signatory != $signatory->user->id) {
             $transaction->current_user_signatory = $signatory->user->id;
@@ -341,6 +343,8 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         }
 
         $transaction->save();
+
+        $this->createTransactionApproval($transaction, $signatory, 'H', $remarks);
     }
 
     public function withDocumentTypes(array $documentTypeIds)
