@@ -4,6 +4,8 @@ namespace SedpMis\Transactions\Repositories\Transaction;
 
 use SedpMis\Transactions\Repositories\Signatory\SignatoryRepositoryInterface;
 use SedpMis\Transactions\Models\Interfaces\TransactionApprovalInterface;
+use SedpMis\Transactions\Models\Interfaces\DocumentApprovalInterface;
+use SedpMis\Transactions\Interfaces\SignatoryDocumentTypesInterface;
 use SedpMis\Transactions\Models\Interfaces\TransactionInterface;
 use SedpMis\Transactions\Interfaces\UserResolverInterface;
 use SedpMis\BaseRepository\BaseBranchRepositoryEloquent;
@@ -34,6 +36,20 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     protected $userResolver;
 
     /**
+     * Signatory document types repository.
+     *
+     * @var \SedpMis\Transactions\Interfaces\SignatoryDocumentTypesInterface
+     */
+    protected $signatoryDocumentTypes;
+
+    /**
+     * DocumentApproval model.
+     *
+     * @var \SedpMis\Transactions\Models\Interfaces\DocumentApprovalInterface
+     */
+    protected $documentApproval;
+
+    /**
      * Constructor.
      *
      * @param \SedpMis\Transactions\Models\Interfaces\TransactionInterface $model
@@ -43,15 +59,21 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         TransactionInterface $model,
         UserResolverInterface $userResolver,
         SignatoryRepositoryInterface $signatory,
-        TransactionApprovalInterface $transactionApproval
+        DocumentApprovalInterface $documentApproval,
+        TransactionApprovalInterface $transactionApproval,
+        SignatoryDocumentTypesInterface $signatoryDocumentTypes
     ) {
         $this->model = $model;
-
-        $this->transactionApproval = $transactionApproval;
 
         $this->signatory = $signatory;
 
         $this->userResolver = $userResolver;
+
+        $this->documentApproval = $documentApproval;
+
+        $this->transactionApproval = $transactionApproval;
+
+        $this->signatoryDocumentTypes = $signatoryDocumentTypes;
     }
 
     /**
