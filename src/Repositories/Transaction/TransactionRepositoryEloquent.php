@@ -39,6 +39,8 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     ) {
         $this->model = $model;
 
+        $this->transactionApproval = $transactionApproval;
+
         $this->signatory = $signatory;
     }
 
