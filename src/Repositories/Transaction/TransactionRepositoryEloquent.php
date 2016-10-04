@@ -253,7 +253,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
             if (in_array($document->document_type_id, $documentTypeIds)) {
                 $collection[] = $this->documentApproval->firstOrCreate([
                     'document_id'         => $document->id,
-                    'user_id'             => $signatory->user->id,
+                    'user_id'             => $this->userResolver->getUser($signatory)->id,
                     'signatory_action_id' => $signatory->signatoryAction->id,
                 ]);
             }
@@ -276,8 +276,8 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         return $this->transactionApproval->create([
             'transaction_id'      => $transaction->id,
             'signatory_id'        => $signatory->id,
-            'user_id'             => $signatory->user->id,
-            'job_id'              => $signatory->user->job_id,
+            'user_id'             => $this->userResolver->getUser($signatory)->id,
+            'job_id'              => $this->userResolver->getUser($signatory)->job_id,
             'signatory_action_id' => $signatory->signatoryAction->id,
             'status'              => $action,
             'remarks'             => $remarks,
@@ -331,7 +331,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         $signatory = $signatory ?: $transaction->curSignatory;
 
         $transaction->current_signatory      = $signatory->id;
-        $transaction->current_user_signatory = $signatory->user->id;
+        $transaction->current_user_signatory = $this->userResolver->getUser($signatory)->id;
         $transaction->status                 = 'R';
         $transaction->save();
 
@@ -354,8 +354,8 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         $signatory = $signatory ?: $transaction->curSignatory;
 
         $transaction->status = 'Q';
-        if ($transaction->current_user_signatory != $signatory->user->id) {
-            $transaction->current_user_signatory = $signatory->user->id;
+        if ($transaction->current_user_signatory != $this->userResolver->getUser($signatory)->id) {
+            $transaction->current_user_signatory = $this->userResolver->getUser($signatory)->id;
             $transaction->current_signatory      = $signatory->id;
         }
 
