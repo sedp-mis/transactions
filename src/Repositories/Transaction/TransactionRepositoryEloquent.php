@@ -210,19 +210,26 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
      *
      * @param  \SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
      * @param  \SedpMis\Transactions\Models\Interfaces\SignatoryInterface $signatory
-     * @return collection
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     protected function createDocumentApprovals($transaction, $signatory)
     {
-        $documentTypeIds = TransactionDocumentSignatory::where('transaction_menu_id', $transaction->transaction_menu_id)
-            ->where('signatory_id', $transaction->curSignatory->id)
-            ->lists('document_type_id');
+        $documentTypeIds = $this->signatoryDocumentTypes->findDocumentTypes(
+            $transaction->transaction_menu_id,
+            $transaction->curSignatory->id
+        )->pluck('id');
 
         $collection = collection();
 
+        $unsavedDocs = $transaction->documents->filter(function ($doc) {
+            return !$doc->exists;
+        });
+
+        $transaction->documents()->saveMany($unsavedDocs->all());
+
         foreach ($transaction->documents as $document) {
             if (in_array($document->document_type_id, $documentTypeIds)) {
-                $collection[] = DocumentApproval::firstOrCreate([
+                $collection[] = $this->documentApproval->firstOrCreate([
                     'document_id'         => $document->id,
                     'user_id'             => $signatory->user->id,
                     'signatory_action_id' => $signatory->signatoryAction->id,
