@@ -247,6 +247,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
             'transaction_id'      => $transaction->id,
             'signatory_id'        => $signatory->id,
             'user_id'             => $signatory->user->id,
+            'job_id'              => $signatory->user->job_id,
             'signatory_action_id' => $signatory->signatoryAction->id,
             'status'              => $action,
             'remarks'             => $remarks,
