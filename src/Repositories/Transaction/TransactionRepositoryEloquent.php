@@ -3,10 +3,11 @@
 namespace SedpMis\Transactions\Repositories\Transaction;
 
 use SedpMis\Transactions\Repositories\Signatory\SignatoryRepositoryInterface;
+use SedpMis\Transactions\Models\Interfaces\TransactionApprovalInterface;
+use SedpMis\Transactions\Models\Interfaces\TransactionInterface;
+use SedpMis\Transactions\Interfaces\UserResolverInterface;
 use SedpMis\BaseRepository\BaseBranchRepositoryEloquent;
 use SedpMis\BaseRepository\RepositoryInterface;
-use SedpMis\Transactions\Models\Interfaces\TransactionInterface;
-use SedpMis\Transactions\Models\Interfaces\TransactionApprovalInterface;
 use SedpMis\Transactions\Models\SignatorySet;
 use Illuminate\Support\Facades\App;
 
@@ -27,6 +28,13 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     protected $transactionApproval;
 
     /**
+     * User resolver.
+     *
+     * @var \SedpMis\Transactions\Interfaces\UserResolverInterface
+     */
+    protected $userResolver;
+
+    /**
      * Constructor.
      *
      * @param \SedpMis\Transactions\Models\Interfaces\TransactionInterface $model
@@ -34,14 +42,17 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
      */
     public function __construct(
         TransactionInterface $model,
-        TransactionApprovalInterface $transactionApproval,
-        SignatoryRepositoryInterface $signatory
+        UserResolverInterface $userResolver,
+        SignatoryRepositoryInterface $signatory,
+        TransactionApprovalInterface $transactionApproval
     ) {
         $this->model = $model;
 
         $this->transactionApproval = $transactionApproval;
 
         $this->signatory = $signatory;
+
+        $this->userResolver = $userResolver;
     }
 
     /**
@@ -52,7 +63,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
      */
     public function queue($transaction)
     {
-        $transaction = is_array($transaction) ? App::make(TransactionInterface::class, $transaction) : $transaction;
+        $transaction = is_array($transaction) ? $this->model->newInstance($transaction) : $transaction;
 
         // Set default attributes
         foreach ($this->queueDefaultAttributes() as $attrib => $value) {
@@ -76,32 +87,10 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         if (empty($transaction->current_user_signatory)) {
             $signatorySet                        = $signatorySet ?: $this->findSignatorySet($transaction->transaction_menu_id);
             $transaction->current_user_signatory = $signatorySet->signatories->first()->user_id ?: $this->findUserByJob($signatorySet->signatories->first()->job_id)->id;
+            $transaction->current_user_signatory = $this->userResolver->getUser($signatorySet->signatories->first())->id;
         }
 
         return $this->save($transaction);
-    }
-
-    /**
-     * Find user by jobId.
-     *
-     * @param  int $jobId
-     * @return \User
-     */
-    public function findUserByJob($jobId)
-    {
-        if (!$branchId = $this->branchId()) {
-            throw new \Exception('Property $branchId must be set to find user signatory by job.');
-        }
-
-        $user = User::where('job_id', $jobId)
-                   ->where('branch_id', $branchId)
-                   ->first();
-
-        if (is_null($user)) {
-            throw new \Exception("User signatory not found for job_id = {$jobId} and classification_id = {$branchId}.");
-        }
-
-        return $user;
     }
 
     /**
@@ -282,7 +271,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         $nextSignatory = $this->signatory->nextSignatory($signatory->id);
 
         if ($nextSignatory) {
-            $transaction->current_user_signatory = $nextSignatory->getUser($this->branchId())->id;
+            $transaction->current_user_signatory = $this->userResolver->getUser($nextSignatory)->id;
             $transaction->current_signatory      = $nextSignatory->id;
             $transaction->status                 = 'Q';
             $transaction->save();
