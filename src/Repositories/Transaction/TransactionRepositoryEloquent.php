@@ -6,6 +6,7 @@ use SedpMis\Transactions\Repositories\Signatory\SignatoryRepositoryInterface;
 use SedpMis\BaseRepository\BaseBranchRepositoryEloquent;
 use SedpMis\BaseRepository\RepositoryInterface;
 use SedpMis\Transactions\Models\Interfaces\TransactionInterface;
+use SedpMis\Transactions\Models\Interfaces\TransactionApprovalInterface;
 use SedpMis\Transactions\Models\SignatorySet;
 use Illuminate\Support\Facades\App;
 
@@ -19,13 +20,23 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     protected $signatory;
 
     /**
+     * TransactionApproval model.
+     *
+     * @var \SedpMis\Transactions\Models\Interfaces\TransactionApprovalInterface
+     */
+    protected $transactionApproval;
+
+    /**
      * Constructor.
      *
      * @param \SedpMis\Transactions\Models\Interfaces\TransactionInterface $model
      * @param \SedpMis\Transactions\Repositories\Signatory\SignatoryRepositoryInterface $signatory
      */
-    public function __construct(TransactionInterface $model, SignatoryRepositoryInterface $signatory)
-    {
+    public function __construct(
+        TransactionInterface $model,
+        TransactionApprovalInterface $transactionApproval,
+        SignatoryRepositoryInterface $signatory
+    ) {
         $this->model = $model;
 
         $this->signatory = $signatory;
@@ -34,8 +45,8 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     /**
      * Queue a transaction for approval.
      *
-     * @param  array|\Transaction $transaction
-     * @return \Transaction
+     * @param  array|\SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
+     * @return \SedpMis\Transactions\Models\Interfaces\TransactionInterface
      */
     public function queue($transaction)
     {
@@ -239,11 +250,11 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
      * @param  \Signatory $signatory
      * @param  string $action
      * @param  string $remarks
-     * @return \TransactionApproval
+     * @return \SedpMis\Transactions\Models\Interfaces\TransactionApprovalInterface
      */
     protected function createTransactionApproval($transaction, $signatory, $action, $remarks)
     {
-        return TransactionApproval::create([
+        return $this->transactionApproval->create([
             'transaction_id'      => $transaction->id,
             'signatory_id'        => $signatory->id,
             'user_id'             => $signatory->user->id,

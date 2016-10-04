@@ -10,6 +10,7 @@ class ModelsProvider extends \Illuminate\Support\ServiceProvider
     {
         $models = [
             'Transaction',
+            'TransactionApproval',
             'Signatory',
         ];
 
