@@ -257,13 +257,15 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     /**
      * Accept a transaction by the curSignatory.
      *
-     * @param  \Transaction $transaction
-     * @param  \Signatory $signatory
+     * @param  \SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
+     * @param  \SedpMis\Transactions\Models\Interfaces\SignatoryInterface $signatory
      * @param  string $remarks
      * @return void
      */
-    public function accept($transaction, $signatory, $remarks)
+    public function accept($transaction, $signatory = null, $remarks = '')
     {
+        $signatory = $signatory ?: $transaction->curSignatory;
+
         $this->createTransactionApproval($transaction, $signatory, 'A', $remarks);
         $this->createDocumentApprovals($transaction, $signatory);
 
@@ -285,13 +287,15 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     /**
      * Reject a transaction by the curSignatory.
      *
-     * @param  \Transaction $transaction
-     * @param  \Signatory $signatory
+     * @param  \SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
+     * @param  \SedpMis\Transactions\Models\Interfaces\SignatoryInterface $signatory
      * @param  string $remarks
      * @return void
      */
-    public function reject($transaction, $signatory, $remarks)
+    public function reject($transaction, $signatory = null, $remarks = '')
     {
+        $signatory = $signatory ?: $transaction->curSignatory;
+
         $this->createTransactionApproval($transaction, $signatory, 'R', $remarks);
 
         $transaction->current_signatory      = $signatory->id;
@@ -306,13 +310,15 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     /**
      * Hold a transaction by the curSignatory.
      *
-     * @param  \Transaction $transaction
-     * @param  \Signatory $signatory
+     * @param  \SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
+     * @param  \SedpMis\Transactions\Models\Interfaces\SignatoryInterface $signatory
      * @param  string $remarks
      * @return void
      */
-    public function hold($transaction, $signatory, $remarks)
+    public function hold($transaction, $signatory = null, $remarks = '')
     {
+        $signatory = $signatory ?: $transaction->curSignatory;
+
         $this->createTransactionApproval($transaction, $signatory, 'H', $remarks);
 
         $transaction->status = 'Q';
