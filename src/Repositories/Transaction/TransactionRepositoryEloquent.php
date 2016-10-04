@@ -220,8 +220,8 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     /**
      * Create document approvals for documents of transaction.
      *
-     * @param  \Transaction $transaction
-     * @param  \Signatory $signatory
+     * @param  \SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
+     * @param  \SedpMis\Transactions\Models\Interfaces\SignatoryInterface $signatory
      * @return collection
      */
     protected function createDocumentApprovals($transaction, $signatory)
@@ -248,8 +248,8 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     /**
      * Create transaction approvals.
      *
-     * @param  \Transaction $transaction
-     * @param  \Signatory $signatory
+     * @param  \SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
+     * @param  \SedpMis\Transactions\Models\Interfaces\SignatoryInterface $signatory
      * @param  string $action
      * @param  string $remarks
      * @return \SedpMis\Transactions\Models\Interfaces\TransactionApprovalInterface
