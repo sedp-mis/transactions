@@ -16,7 +16,7 @@ class AccountingDocumentsController extends BaseDocumentController
     protected $documentTypeIds = [DocumentType::JV, DocumentType::CD, DocumentType::OR_];
 
     protected $eagerLoadWithTransaction = [
-        'documents.journalHead.journalEntries.account'
+        'documents.journalHead.journalEntries.account',
     ];
 
     public function loadReportPdf($transaction)
@@ -37,7 +37,7 @@ class AccountingDocumentsController extends BaseDocumentController
 
         // // Set pdf signatories data
         $pdf->setSignsData($dataFormat->signsData());
-        
+
         $pdf->showReport();
     }
 }

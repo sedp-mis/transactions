@@ -17,7 +17,7 @@ class User extends \Eloquent
 
         if (is_array($branchId)) {
             return $query->whereIn('branch_id', $branchId)->get();
-        } 
+        }
 
         return $query->where('branch_id', $branchId)->first();
     }

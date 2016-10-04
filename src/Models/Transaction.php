@@ -4,7 +4,6 @@ namespace SedpMis\Transactions\Models;
 
 class Transaction extends \Eloquent
 {
-
     public function menu()
     {
         return $this->belongsTo(Menu::class, 'transaction_menu_id');
@@ -24,7 +23,7 @@ class Transaction extends \Eloquent
     {
         return $this->belongsTo(User::class, 'current_user_signatory');
     }
-    
+
     public function transactionApprovals()
     {
         return $this->hasMany(TransactionApproval::class);

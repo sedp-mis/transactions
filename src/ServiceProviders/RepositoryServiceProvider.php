@@ -14,8 +14,7 @@ class RepositoryServiceProvider extends \Illuminate\Support\ServiceProvider
             'Transaction',
         ];
 
-        foreach ($repositories as $i => $name) 
-        {
+        foreach ($repositories as $i => $name) {
             $this->app->bind(
                 "SedpMis\\Transactions\\Repositories\\{$name}\\{$name}RepositoryInterface",
                 "SedpMis\\Transactions\\Repositories\\{$name}\\{$name}RepositoryEloquent"

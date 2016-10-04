@@ -2,26 +2,27 @@
 
 namespace SedpMis\Transactions\Repositories\Signatory;
 
-use Abstractions\Repository\BaseRepositoryEloquent;
 use Abstractions\Repository\RepositoryInterface;
-use Signatory;
+use Abstractions\Repository\BaseRepositoryEloquent;
+use SedpMis\Transactions\Models\Interfaces\SignatoryInterface;
 
 class SignatoryRepositoryEloquent extends BaseRepositoryEloquent implements SignatoryRepositoryInterface, RepositoryInterface
 {
     /**
-     * `__construct` constructing class or model to be use.    
-     * @param Signatory $model [description]
+     * Construct.
+     *
+     * @param \SedpMis\Transactions\Models\Interfaces\SignatoryInterface $model
      */
-    public function __construct(Signatory $model)
+    public function __construct(SignatoryInterface $model)
     {
         $this->model = $model;
     }
 
     /**
      * Get the first signatory of a signatory set.
-     * 
+     *
      * @param  int $signatorySetId Signatory set ID
-     * @return \Signatory
+     * @return \SedpMis\Transactions\Models\Interfaces\SignatoryInterface
      */
     public function firstSignatory($signatorySetId)
     {
@@ -30,9 +31,9 @@ class SignatoryRepositoryEloquent extends BaseRepositoryEloquent implements Sign
 
     /**
      * Get the next signatory of a given signatory id.
-     * 
+     *
      * @param  int $signatoryId Signatory ID
-     * @return \Signatory
+     * @return \SedpMis\Transactions\Models\Interfaces\SignatoryInterface
      */
     public function nextSignatory($signatoryId)
     {
@@ -43,9 +44,9 @@ class SignatoryRepositoryEloquent extends BaseRepositoryEloquent implements Sign
 
     /**
      * Get the previous signatory of a given signatory id.
-     * 
-     * @param  int $signatoryId Signatory ID
-     * @return \Signatory
+     *
+     * @param  int $signatoryId
+     * @return \SedpMis\Transactions\Models\Interfaces\SignatoryInterface
      */
     public function previousSignatory($signatoryId)
     {
@@ -56,10 +57,10 @@ class SignatoryRepositoryEloquent extends BaseRepositoryEloquent implements Sign
 
     /**
      * Get the signatory of a given signatory set id and the hierarchy position.
-     * 
+     *
      * @param  int $signatorySetId Signatory set ID
      * @param  int $hierarchy      The hierarchy position of the signatory
-     * @return \Signatory
+     * @return \SedpMis\Transactions\Models\Interfaces\SignatoryInterface
      */
     public function signatoryAtHierarchy($signatorySetId, $hierarchy)
     {
@@ -70,7 +71,7 @@ class SignatoryRepositoryEloquent extends BaseRepositoryEloquent implements Sign
 
     /**
      * Get the signatories from the given starting hierarchy.
-     * 
+     *
      * @param  int $signatorySetId Signatory set ID
      * @param  int $hierarchy      Starting hierarchy to be fetched
      * @return collection

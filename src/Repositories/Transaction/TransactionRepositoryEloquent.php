@@ -5,14 +5,15 @@ namespace SedpMis\Transactions\Repositories\Transaction;
 use SedpMis\Transactions\Repositories\Signatory\SignatoryRepositoryInterface;
 use SedpMis\BaseRepository\BaseBranchRepositoryEloquent;
 use SedpMis\BaseRepository\RepositoryInterface;
-use SedpMis\Transactions\Models\Transaction;
+use SedpMis\Transactions\Models\Interfaces\TransactionInterface;
 use SedpMis\Transactions\Models\SignatorySet;
+use Illuminate\Support\Facades\App;
 
 class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent implements RepositoryInterface, TransactionRepositoryInterface
 {
     /**
      * Signatory repository.
-     * 
+     *
      * @var \SedpMis\Transactions\Repositories\Signatory\SignatoryRepositoryInterface
      */
     protected $signatory;
@@ -20,12 +21,13 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     /**
      * Constructor.
      *
-     * @param \SedpMis\Transactions\Models\Transaction $model
+     * @param \SedpMis\Transactions\Models\Interfaces\TransactionInterface $model
      * @param \SedpMis\Transactions\Repositories\Signatory\SignatoryRepositoryInterface $signatory
      */
-    public function __construct(Transaction $model, SignatoryRepositoryInterface $signatory)
+    public function __construct(TransactionInterface $model, SignatoryRepositoryInterface $signatory)
     {
-        $this->model     = $model;
+        $this->model = $model;
+
         $this->signatory = $signatory;
     }
 
@@ -37,7 +39,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
      */
     public function queue($transaction)
     {
-        $transaction = $transaction instanceof Transaction ? $transaction : $this->makeModel($transaction);
+        $transaction = is_array($transaction) ? App::make(TransactionInterface::class, $transaction) : $transaction;
 
         // Set default attributes
         foreach ($this->queueDefaultAttributes() as $attrib => $value) {
@@ -326,7 +328,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         $this->with([
             'documents.documentType' => function ($query) use ($documentTypeIds) {
                 $query->whereIn('id', $documentTypeIds);
-            }
+            },
         ]);
 
         return $this;

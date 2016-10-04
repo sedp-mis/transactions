@@ -23,7 +23,7 @@ abstract class BaseDocumentController extends \Illuminate\Routing\Controller
     protected $transaction;
 
     /**
-     * Document type Ids for the report
+     * Document type Ids for the report.
      *
      * @var array
      */
@@ -36,13 +36,12 @@ abstract class BaseDocumentController extends \Illuminate\Routing\Controller
      */
     protected $eagerLoadWithTransaction = [];
 
-
     public function __construct(
         DocumentTypeSignatoryRepositoryInterface $documentTypeSignatory,
         TransactionRepositoryInterface $transaction
     ) {
-       $this->documentTypeSignatory = $documentTypeSignatory;
-       $this->transaction           = $transaction;
+        $this->documentTypeSignatory = $documentTypeSignatory;
+        $this->transaction           = $transaction;
     }
 
     public function show($transactionId)
@@ -54,15 +53,15 @@ abstract class BaseDocumentController extends \Illuminate\Routing\Controller
                 'documents.documentApprovals.signatoryAction',
                 'documents.documentApprovals.user',
                 'documents.documentApprovals.job',
-                'documents.documentType', 
-                'transactionApprovals'
+                'documents.documentType',
+                'transactionApprovals',
             ], $this->eagerLoadWithTransaction))
             ->findOrFail($transactionId);
 
         // If transaction is still in queue, signatories from settings will retrieved and set them as signatories for the documents
         if ($transaction->status == 'Q') {
             $signatories = $this->documentTypeSignatory->findSignatoriesByTransaction(
-                $transaction, 
+                $transaction,
                 collection($transaction->documents->pluck('documentType')),
                 $transaction->transactionApprovals->count() + 1
             );

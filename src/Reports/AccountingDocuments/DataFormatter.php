@@ -19,10 +19,10 @@ class DataFormatter
 
         foreach ($transaction->documents as $document) {
             $headDetails[] = [
-                'branch_name' => $transaction->branch->name,
-                'particulars' => $document->journalHead->particulars,
+                'branch_name'      => $transaction->branch->name,
+                'particulars'      => $document->journalHead->particulars,
                 'reference_number' => $document->journalHead->id,
-                'date' => $transaction->transacted_at,
+                'date'             => $transaction->transacted_at,
             ];
         }
 
