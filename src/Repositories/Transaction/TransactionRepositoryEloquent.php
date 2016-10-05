@@ -7,10 +7,12 @@ use SedpMis\Transactions\Models\Interfaces\TransactionApprovalInterface;
 use SedpMis\Transactions\Models\Interfaces\DocumentApprovalInterface;
 use SedpMis\Transactions\Interfaces\SignatoryDocumentTypesInterface;
 use SedpMis\Transactions\Models\Interfaces\TransactionInterface;
+use SedpMis\Transactions\Interfaces\MenuSignatorySetInterface;
 use SedpMis\Transactions\Interfaces\UserResolverInterface;
 use SedpMis\BaseRepository\BaseBranchRepositoryEloquent;
 use SedpMis\BaseRepository\RepositoryInterface;
 use SedpMis\Transactions\Models\SignatorySet;
+use InvalidArgumentException;
 
 class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent implements RepositoryInterface, TransactionRepositoryInterface
 {
@@ -50,16 +52,29 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     protected $documentApproval;
 
     /**
-     * Constructor.
+     * Menu's signatorySet repository.
      *
-     * @param \SedpMis\Transactions\Models\Interfaces\TransactionInterface $model
-     * @param \SedpMis\Transactions\Repositories\Signatory\SignatoryRepositoryInterface $signatory
+     * @var \SedpMis\Transactions\Interfaces\MenuSignatorySetInterface
+     */
+    protected $menuSignatorySet;
+
+    /**
+     * Construct.
+     *
+     * @param TransactionInterface            $model
+     * @param UserResolverInterface           $userResolver
+     * @param SignatoryRepositoryInterface    $signatory
+     * @param DocumentApprovalInterface       $documentApproval
+     * @param MenuSignatorySetInterface       $menuSignatorySet
+     * @param TransactionApprovalInterface    $transactionApproval
+     * @param SignatoryDocumentTypesInterface $signatoryDocumentTypes
      */
     public function __construct(
         TransactionInterface $model,
         UserResolverInterface $userResolver,
         SignatoryRepositoryInterface $signatory,
         DocumentApprovalInterface $documentApproval,
+        MenuSignatorySetInterface $menuSignatorySet,
         TransactionApprovalInterface $transactionApproval,
         SignatoryDocumentTypesInterface $signatoryDocumentTypes
     ) {
@@ -68,6 +83,8 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         $this->signatory = $signatory;
 
         $this->userResolver = $userResolver;
+
+        $this->menuSignatorySet = $menuSignatorySet;
 
         $this->documentApproval = $documentApproval;
 
@@ -81,6 +98,8 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
      *
      * @param  array|\SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
      * @return \SedpMis\Transactions\Models\Interfaces\TransactionInterface
+     *
+     * @throws \InvalidArgumentException
      */
     public function queue($transaction)
     {
@@ -91,57 +110,31 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
             $transaction->{$attrib} = $transaction->{$attrib} ?: $value;
         }
 
-        // init for reference
-        $signatorySet = null;
-
-        // Set current_signatory if not set
-        if (empty($transaction->current_signatory)) {
+        // Set relation curSignatory (fk: current_signatory) if not set
+        if (empty($transaction->curSignatory)) {
             if (empty($transaction->transaction_menu_id)) {
-                throw new \InvalidArgumentException('Attribute transaction_menu_id does not exists in the given transaction. Cannot find signatorySet and current_signatory');
+                throw new InvalidArgumentException('Attribute transaction_menu_id does not exists in the given transaction. Cannot find signatorySet and current_signatory');
             }
 
-            $signatorySet                   = $this->findSignatorySet($transaction->transaction_menu_id);
-            $transaction->current_signatory = $signatorySet->signatories->first()->id;
+            $signatory = $this->menuSignatorySet->findSignatorySet($transaction->transaction_menu_id)->signatories->first();
+            $transaction->setRelation('curSignatory', $signatory);
         }
 
-        // Set current_user_signatory if not set
-        if (empty($transaction->current_user_signatory)) {
-            $signatorySet                        = $signatorySet ?: $this->findSignatorySet($transaction->transaction_menu_id);
-            $transaction->current_user_signatory = $this->userResolver->getUser($signatorySet->signatories->first())->id;
+        // Set relation curUserSignatory (fk: current_user_signatory) if not set
+        if (empty($transaction->curUserSignatory)) {
+            $transaction->setRelation('curUserSignatory', $this->userResolver->getUser($transaction->curSignatory));
         }
+
+        // Make sure to save fks.
+        $transaction->current_signatory = $transaction->curSignatory->id;
+        $transaction->current_user_signatory = $transaction->curUserSignatory->id;
 
         $this->save($transaction);
 
         return $transaction;
     }
 
-    /**
-     * Find signatory set of a menu.
-     *
-     * @param  int $menuId
-     * @return \SignatorySet
-     */
-    public function findSignatorySet($menuId)
-    {
-        $signatorySet = SignatorySet::with([
-            'signatories' => function ($query) {
-                return $query->orderBy('hierarchy')->limit(1);
-            },
-        ])->whereHas('menus', function ($q) use ($menuId) {
-            $q->where('menu_id', $menuId);
-        })
-        ->first();
 
-        if (is_null($signatorySet)) {
-            throw new \Exception("Error: transaction_signatory_set is not set for menu id {$menuId}");
-        }
-
-        if ($signatorySet->signatories->count() == 0) {
-            throw new \Exception("SignatorySet \"{$signatorySet->name}\" (id: {$signatorySet->id}) has no signatories.");
-        }
-
-        return $signatorySet;
-    }
 
     /**
      * Return default attributes for transaction for queue.
