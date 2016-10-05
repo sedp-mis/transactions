@@ -97,7 +97,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         // Set current_signatory if not set
         if (empty($transaction->current_signatory)) {
             if (empty($transaction->transaction_menu_id)) {
-                throw new \Exception('Attribute transaction_menu_id does not exists in the given transaction. Cannot find signatorySet and current_signatory');
+                throw new \InvalidArgumentException('Attribute transaction_menu_id does not exists in the given transaction. Cannot find signatorySet and current_signatory');
             }
 
             $signatorySet                   = $this->findSignatorySet($transaction->transaction_menu_id);
