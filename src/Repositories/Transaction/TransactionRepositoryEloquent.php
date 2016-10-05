@@ -126,15 +126,13 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         }
 
         // Make sure to save fks.
-        $transaction->current_signatory = $transaction->curSignatory->id;
+        $transaction->current_signatory      = $transaction->curSignatory->id;
         $transaction->current_user_signatory = $transaction->curUserSignatory->id;
 
         $this->save($transaction);
 
         return $transaction;
     }
-
-
 
     /**
      * Return default attributes for transaction for queue.
