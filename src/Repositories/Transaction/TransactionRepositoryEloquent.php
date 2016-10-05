@@ -125,7 +125,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
             $transaction->setRelation('curUserSignatory', $this->userResolver->getUser($transaction->curSignatory));
         }
 
-        // Make sure to save fks.
+        // Make sure to save fks
         $transaction->current_signatory      = $transaction->curSignatory->id;
         $transaction->current_user_signatory = $transaction->curUserSignatory->id;
 
