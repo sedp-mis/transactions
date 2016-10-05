@@ -111,7 +111,9 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
             $transaction->current_user_signatory = $this->userResolver->getUser($signatorySet->signatories->first())->id;
         }
 
-        return $this->save($transaction);
+        $this->save($transaction);
+
+        return $transaction;
     }
 
     /**
