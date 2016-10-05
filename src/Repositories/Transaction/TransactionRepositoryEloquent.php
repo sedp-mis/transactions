@@ -107,7 +107,6 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         // Set current_user_signatory if not set
         if (empty($transaction->current_user_signatory)) {
             $signatorySet                        = $signatorySet ?: $this->findSignatorySet($transaction->transaction_menu_id);
-            $transaction->current_user_signatory = $signatorySet->signatories->first()->user_id ?: $this->findUserByJob($signatorySet->signatories->first()->job_id)->id;
             $transaction->current_user_signatory = $this->userResolver->getUser($signatorySet->signatories->first())->id;
         }
 
