@@ -18,7 +18,6 @@ class RepositoryServiceProvider extends \Illuminate\Support\ServiceProvider
             $this->app->bind(
                 "SedpMis\\Transactions\\Repositories\\{$name}\\{$name}RepositoryInterface",
                 "SedpMis\\Transactions\\Repositories\\{$name}\\{$name}RepositoryEloquent"
-                // true
             );
         }
     }
