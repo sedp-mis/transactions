@@ -141,7 +141,7 @@ class TransactionController extends \Illuminate\Routing\Controller
         $words = [
             'a' => 'accept',
             'r' => 'reject',
-            'h' => 'hold'
+            'h' => 'hold',
         ];
 
         return $words[$this->parseAction($action)];
