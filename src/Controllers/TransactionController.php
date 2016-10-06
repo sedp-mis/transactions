@@ -8,6 +8,7 @@ use SedpMis\Transactions\Models\Interfaces\UserInterface;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use RuntimeException;
 
 class TransactionController extends \Illuminate\Routing\Controller
 {
@@ -101,6 +102,10 @@ class TransactionController extends \Illuminate\Routing\Controller
             $signatory->setRelation('signatoryAction', $transaction->lastTransactionApproval->signatoryAction);
         }
 
+        if (is_null($signatory->id)) {
+            throw new RuntimeException("Trying to {$this->actionToWord($action)} by a signatory which id is null, on transaction {$transactionId}.");
+        }
+
         $action = $this->parseAction($action);
 
         if ($action == 'a') {
@@ -123,5 +128,22 @@ class TransactionController extends \Illuminate\Routing\Controller
     protected function parseAction($action)
     {
         return strtolower(head(str_split($action)));
+    }
+
+    /**
+     * Translate an action code to word.
+     *
+     * @param  string $action
+     * @return string
+     */
+    protected function actionToWord($action)
+    {
+        $words = [
+            'a' => 'accept',
+            'r' => 'reject',
+            'h' => 'hold'
+        ];
+
+        return $words[$this->parseAction($action)];
     }
 }
