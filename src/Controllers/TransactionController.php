@@ -101,16 +101,29 @@ class TransactionController extends \Illuminate\Routing\Controller
             $signatory->setRelation('signatoryAction', $transaction->lastTransactionApproval->signatoryAction);
         }
 
-        if ($action == 'A') {
+        $action = $this->parseAction($action);
+
+        if ($action == 'a') {
             $this->transaction->accept($transaction, $signatory, $remarks);
-        } elseif ($action == 'R') {
+        } elseif ($action == 'r') {
             $this->transaction->reject($transaction, $signatory, $remarks);
-        } elseif ($action == 'H') {
+        } elseif ($action == 'h') {
             $this->transaction->hold($transaction, $signatory, $remarks);
         }
 
         DB::commit();
 
         return $this->respondSuccess();
+    }
+
+    /**
+     * Return the action first letter to interpret the desired action.
+     *
+     * @param  string $action
+     * @return string
+     */
+    protected function parseAction($action)
+    {
+        return strtolower(head(str_split($action)));
     }
 }
