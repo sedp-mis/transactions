@@ -246,6 +246,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
                 $collection[] = $this->documentApproval->firstOrCreate([
                     'document_id'         => $document->id,
                     'user_id'             => $this->userResolver->getUser($signatory)->id,
+                    'job_id'              => $this->userResolver->getUser($signatory)->job_id,
                     'signatory_action_id' => $signatory->signatoryAction->id,
                 ]);
             }
