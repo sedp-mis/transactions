@@ -112,8 +112,6 @@ class TransactionController extends \Illuminate\Routing\Controller
         }
 
         DB::commit();
-
-        return $this->respondSuccess();
     }
 
     /**
