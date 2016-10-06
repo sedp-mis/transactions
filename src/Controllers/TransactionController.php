@@ -3,6 +3,7 @@
 namespace SedpMis\Transactions\Controllers;
 
 use SedpMis\Transactions\Repositories\Transaction\TransactionRepositoryInterface;
+use SedpMis\Transactions\Models\Interfaces\SignatoryInterface;
 use SedpMis\Transactions\Models\Interfaces\UserInterface;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
@@ -32,6 +33,13 @@ class TransactionController extends \Illuminate\Routing\Controller
     protected $user;
 
     /**
+     * Signatory model.
+     *
+     * @var \SedpMis\Transactions\Models\Interfaces\SignatoryInterface
+     */
+    protected $signatory;
+
+    /**
      * Construct.
      *
      * @param Request                        $request
@@ -41,11 +49,14 @@ class TransactionController extends \Illuminate\Routing\Controller
     public function __construct(
         Request $request,
         UserInterface $user,
+        SignatoryInterface $signatory,
         TransactionRepositoryInterface $transaction
     ) {
         $this->user = $user;
 
         $this->request = $request;
+
+        $this->signatory = $signatory;
 
         $this->transaction = $transaction;
     }
@@ -81,7 +92,10 @@ class TransactionController extends \Illuminate\Routing\Controller
 
         // Set signatory to the previous user signatory
         if ($transaction->current_user_signatory != $user->id) {
-            $signatory     = new Signatory(['user_id' => $user->id, 'signatory_action_id' => $transaction->lastTransactionApproval->signatory_action_id]);
+            $signatory = $this->signatory->newInstance([
+                'user_id'             => $user->id, 
+                'signatory_action_id' => $transaction->lastTransactionApproval->signatory_action_id
+            ]);
             $signatory->id = $transaction->lastTransactionApproval->signatory_id;
             $signatory->setRelation('user', $user);
             $signatory->setRelation('signatoryAction', $transaction->lastTransactionApproval->signatoryAction);
