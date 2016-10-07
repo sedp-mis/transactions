@@ -399,7 +399,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     public function getHistoricalTransactions($userId)
     {
         $query = $this->prepareQuery();
-        $query->whereIn('transactions.id', $this->transactionApproval->where('user_id', $userId)->lists('transaction_id'));
+        $query->whereIn('transactions.id', $this->transactionApproval->where('user_id', $userId)->lists('transaction_id') ?: [null]);
         $query->where('transactions.current_user_signatory', '!=', $userId);
 
         return $query->get($this->finalAttributes());
