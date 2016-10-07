@@ -53,7 +53,7 @@ class TransactionsController extends \SedpMis\BaseApi\BaseApiController
     {
         $this->repo->applyQueryParams($this->request);
 
-        return $this->transaction->getTrackedTransactions(get_user_session());
+        return $this->repo->getTrackedTransactions(get_user_session());
     }
 
     /**
@@ -65,6 +65,6 @@ class TransactionsController extends \SedpMis\BaseApi\BaseApiController
     {
         $this->repo->applyQueryParams($this->request);
 
-        return $this->transaction->getHistoricalTransactions(get_user_session());
+        return $this->repo->getHistoricalTransactions(get_user_session());
     }
 }
