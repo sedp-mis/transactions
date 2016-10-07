@@ -13,6 +13,7 @@ class Router
      */
     public static function route()
     {
+        Route::get('transactions', '\SedpMis\Transactions\Controllers\TransactionsController@index');
         Route::get('transactions/pending', '\SedpMis\Transactions\Controllers\TransactionsController@pending');
         Route::get('transactions/tracker', '\SedpMis\Transactions\Controllers\TransactionsController@tracker');
         Route::get('transactions/history', '\SedpMis\Transactions\Controllers\TransactionsController@history');
