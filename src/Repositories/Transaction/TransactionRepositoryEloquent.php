@@ -358,6 +358,12 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         $this->createTransactionApproval($transaction, $signatory, 'H', $remarks);
     }
 
+    /**
+     * Eager load documents with specific document type ids.
+     *
+     * @param  array  $documentTypeIds
+     * @return $this
+     */
     public function withDocumentTypes(array $documentTypeIds)
     {
         $this->with([
