@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use RuntimeException;
 
-class TransactionController extends \Illuminate\Routing\Controller
+class TransactionActionController extends \Illuminate\Routing\Controller
 {
     /**
      * Request instance.
