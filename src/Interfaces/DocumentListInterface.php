@@ -2,6 +2,9 @@
 
 namespace SedpMis\Transactions\Interfaces;
 
+/**
+ * Responsible for listing documents.
+ */
 interface DocumentListInterface
 {
     /**
