@@ -19,7 +19,6 @@ class TransactionsController extends \SedpMis\BaseApi\BaseApiController
      */
     protected $request;
 
-
     /**
      * Construct.
      *
@@ -40,7 +39,7 @@ class TransactionsController extends \SedpMis\BaseApi\BaseApiController
     {
         return $this->repo->applyQueryParams($this->request)->filters([
             'current_user_signatory' => get_user_session(),
-            'status'                 => 'Q'
+            'status'                 => 'Q',
         ])
         ->get();
     }
@@ -59,13 +58,13 @@ class TransactionsController extends \SedpMis\BaseApi\BaseApiController
 
     /**
      * Return historical transaction.
-     * 
+     *
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public function history()
     {
         $this->repo->applyQueryParams($this->request);
-        
+
         return $this->transaction->getHistoricalTransactions(get_user_session());
     }
 }
