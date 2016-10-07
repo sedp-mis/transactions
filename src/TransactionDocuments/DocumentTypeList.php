@@ -49,7 +49,7 @@ class DocumentTypeList implements DocumentListInterface
     {
         $documentLists = collection();
 
-        foreach ($transaction->documents->groupBy('document_type_id') as $documents) {
+        foreach ($this->getDocuments($transaction)->groupBy('document_type_id') as $documents) {
             $documentList = new static;
 
             // Set relation models.
@@ -66,6 +66,21 @@ class DocumentTypeList implements DocumentListInterface
         }
 
         return $documentLists;
+    }
+
+    /**
+     * Get the documents in the transaction.
+     *
+     * @param  \SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    protected function getDocuments($transaction)
+    {
+        if ($transaction->is_reversal && $transaction->referenceTransaction) {
+            return $transaction->referenceTransaction->documents;
+        }
+
+        return $transaction->documents;
     }
 
     /**

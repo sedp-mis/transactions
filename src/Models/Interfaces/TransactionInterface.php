@@ -45,4 +45,11 @@ interface TransactionInterface
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function curSignatory();
+
+    /**
+     * Reference transaction for reversal transaction.
+     *
+     * @return static
+     */
+    public function referenceTransaction();
 }
