@@ -52,6 +52,5 @@ class TransactionDocumentsController extends \Illuminate\Routing\Controller
         return (new DocumentListFactory)->make($transaction->menu)->lists($transaction)->transform(function ($documentList) {
             return $this->documentListFormatter->format($documentList);
         });
-
     }
 }
