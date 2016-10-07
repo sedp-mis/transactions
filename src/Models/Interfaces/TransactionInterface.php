@@ -49,7 +49,7 @@ interface TransactionInterface
     /**
      * Reference transaction for reversal transaction.
      *
-     * @return static
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function referenceTransaction();
 }
