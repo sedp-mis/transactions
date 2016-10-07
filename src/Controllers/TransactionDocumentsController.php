@@ -3,8 +3,8 @@
 namespace SedpMis\Transactions\Controllers;
 
 use SedpMis\Transactions\Interfaces\DocumentListFormatterInterface;
+use SedpMis\Transactions\TransactionDocuments\DocumentListFactory;
 use SedpMis\Transactions\Models\Interfaces\TransactionInterface;
-use SedpMis\Transactions\Interfaces\DocumentListInterface;
 
 class TransactionDocumentsController extends \Illuminate\Routing\Controller
 {
@@ -14,13 +14,6 @@ class TransactionDocumentsController extends \Illuminate\Routing\Controller
      * @var \SedpMis\Transactions\Models\Interfaces\TransactionInterface
      */
     protected $transaction;
-
-    /**
-     * Document list.
-     *
-     * @var \SedpMis\Transactions\Interfaces\DocumentListInterface
-     */
-    protected $documentList;
 
     /**
      * Document list formatter.
@@ -38,11 +31,9 @@ class TransactionDocumentsController extends \Illuminate\Routing\Controller
      */
     public function __construct(
         TransactionInterface $transaction,
-        DocumentListInterface $documentList,
         DocumentListFormatterInterface $documentListFormatter
     ) {
         $this->transaction           = $transaction;
-        $this->documentList          = $documentList;
         $this->documentListFormatter = $documentListFormatter;
     }
 
@@ -58,8 +49,9 @@ class TransactionDocumentsController extends \Illuminate\Routing\Controller
             'documents.documentType', 'curUserSignatory', 'curSignatory.signatoryAction', 'menu.documentService',
         ])->findOrFail($id);
 
-        return $this->documentList->lists($transaction)->transform(function ($documentList) {
+        return (new DocumentListFactory)->make($transaction->menu)->lists($transaction)->transform(function ($documentList) {
             return $this->documentListFormatter->format($documentList);
         });
+
     }
 }
