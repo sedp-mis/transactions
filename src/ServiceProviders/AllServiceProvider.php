@@ -8,11 +8,5 @@ class AllServiceProvider extends \Illuminate\Support\ServiceProvider
     {
         // Register repository provider
         (new RepositoryServiceProvider($this->app))->register();
-
-        // Register bindings for documentList inteface
-        $this->app->bind(
-            '\SedpMis\Transactions\Interfaces\DocumentListInterface',
-            '\SedpMis\Transactions\TransactionDocuments\DocumentTypeList'
-        );
     }
 }
