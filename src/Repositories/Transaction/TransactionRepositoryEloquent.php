@@ -374,4 +374,38 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
 
         return $this;
     }
+
+    /**
+     * Get the tracked transactions for the involved user.
+     *
+     * @param  int $userId
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getTrackedTransactions($userId)
+    {
+        $query = $this->prepareQuery();
+
+        $query->where('transactions.status', 'Q');
+        $query->whereIn('transactions.id', $this->transactionApproval->where('user_id', $userId)->lists('transaction_id'));
+
+        return $query->get($this->finalAttributes());
+    }
+
+    /**
+     * Get user's historical transactions.
+     *
+     * @param  int $userId
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getHistoricalTransactions($userId)
+    {
+        $query = $this->prepareQuery();
+
+        $query->where();
+
+        $query->whereIn('transactions.id', $this->transactionApproval->where('user_id', $userId)->lists('transaction_id'));
+        $query->where('transactions.current_user_signatory', '!=', $userId);
+
+        return $query->get($this->finalAttributes());
+    }
 }

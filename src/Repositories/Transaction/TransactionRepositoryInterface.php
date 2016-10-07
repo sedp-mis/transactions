@@ -51,4 +51,20 @@ interface TransactionRepositoryInterface
      * @return void
      */
     public function hold($transaction, $signatory, $remarks);
+
+    /**
+     * Get the tracked transactions for the involved user.
+     *
+     * @param  int $userId
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getTrackedTransactions($userId);
+
+    /**
+     * Get user's historical transactions.
+     *
+     * @param  int $userId
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getHistoricalTransactions($userId);
 }
