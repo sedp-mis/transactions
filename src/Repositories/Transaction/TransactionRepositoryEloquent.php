@@ -12,7 +12,7 @@ use SedpMis\Transactions\Interfaces\UserResolverInterface;
 use SedpMis\BaseRepository\BaseBranchRepositoryEloquent;
 use SedpMis\BaseRepository\RepositoryInterface;
 use SedpMis\Transactions\Models\SignatorySet;
-use Illuminate\Events\Dispatcher as Event;
+use Illuminate\Support\Facades\Event;
 use InvalidArgumentException;
 
 class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent implements RepositoryInterface, TransactionRepositoryInterface
