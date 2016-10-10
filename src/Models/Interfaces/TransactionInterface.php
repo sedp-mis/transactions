@@ -37,14 +37,14 @@ interface TransactionInterface
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function curUserSignatory();
+    public function currentUser();
 
     /**
      * Current signatory relation.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function curSignatory();
+    public function currentSignatory();
 
     /**
      * Reference transaction for reversal transaction.

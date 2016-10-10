@@ -14,14 +14,14 @@ class Transaction extends \Eloquent
         return $this->hasMany(Document::class);
     }
 
-    public function curSignatory()
+    public function currentSignatory()
     {
-        return $this->belongsTo(Signatory::class, 'current_signatory');
+        return $this->belongsTo(Signatory::class);
     }
 
-    public function curUserSignatory()
+    public function currentUser()
     {
-        return $this->belongsTo(User::class, 'current_user_signatory');
+        return $this->belongsTo(User::class);
     }
 
     public function transactionApprovals()
