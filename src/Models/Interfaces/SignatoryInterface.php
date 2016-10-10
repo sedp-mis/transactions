@@ -19,13 +19,6 @@ interface SignatoryInterface
     public function signatoryAction();
 
     /**
-     * Signatory relation.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function signatory();
-
-    /**
      * User relation.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
