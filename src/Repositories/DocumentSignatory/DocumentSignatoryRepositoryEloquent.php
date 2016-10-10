@@ -67,13 +67,13 @@ class DocumentSignatoryRepositoryEloquent implements DocumentSignatoryRepository
      */
     public function findSignatories($documentId)
     {
-        $document = $documentId instanceof Document ? $documentId : Document::with('transaction.curSignatory')->find($documentId);
+        $document = $documentId instanceof Document ? $documentId : Document::with('transaction.currentSignatory')->find($documentId);
 
         // Get the actual signatories by using documentApproval.
         $documentApprovals = DocumentApproval::with(['user', 'signatoryAction'])->where('document_id', $documentId)->orderBy('created_at')->get();
 
         $signatories = Signatory::with('signatoryAction')
-            ->where('signatory_set_id', $document->transaction->curSignatory->signatory_set_id)
+            ->where('signatory_set_id', $document->transaction->currentSignatory->signatory_set_id)
             ->whereRaw('id in (select signatory_id from transaction_document_signatories where '.
                 "transaction_menu_id = {$document->transaction->transaction_menu_id} and document_type_id = {$document->document_type_id})")
             ->skip($documentApprovals->count())

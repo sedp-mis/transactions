@@ -76,8 +76,8 @@ class TransactionActionController extends \Illuminate\Routing\Controller
         $remarks = $this->request->input('remarks', '');
 
         $transaction = $this->transaction->with([
-            'curSignatory.signatoryAction',
-            'curUserSignatory',
+            'currentSignatory.signatoryAction',
+            'currentUser',
             'lastTransactionApproval.signatoryAction',
             ])->find($transactionId);
 
@@ -88,8 +88,8 @@ class TransactionActionController extends \Illuminate\Routing\Controller
         }
 
         // Assign the signatory that set an action to the transaction
-        $signatory = $transaction->curSignatory;
-        $signatory->setRelation('user', $transaction->curUserSignatory);
+        $signatory = $transaction->currentSignatory;
+        $signatory->setRelation('user', $transaction->currentUser);
 
         // Set signatory to the previous user signatory
         if ($transaction->current_user_signatory != $user->id) {

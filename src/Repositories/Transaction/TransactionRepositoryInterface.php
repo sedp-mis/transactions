@@ -15,7 +15,7 @@ interface TransactionRepositoryInterface
     /**
      * Save the accounting document of a transaction.
      *
-     * @param  int $transactionId  [description]
+     * @param  int $transactionId
      * @param  array|\Modules\Transaction\Data\AccountingDocument $acctDoc
      * @param  int $documentTypeId
      * @return \Document
@@ -23,7 +23,7 @@ interface TransactionRepositoryInterface
     public function saveAccountingDocument($transactionId, $acctDoc, $documentTypeId = null);
 
     /**
-     * Accept a transaction by the curSignatory.
+     * Accept a transaction by the currentSignatory.
      *
      * @param  \Transaction $transaction
      * @param  \Signatory $signatory
@@ -33,7 +33,7 @@ interface TransactionRepositoryInterface
     public function accept($transaction, $signatory, $remarks);
 
     /**
-     * Reject a transaction by the curSignatory.
+     * Reject a transaction by the currentSignatory.
      *
      * @param  \Transaction $transaction
      * @param  \Signatory $signatory
@@ -43,7 +43,7 @@ interface TransactionRepositoryInterface
     public function reject($transaction, $signatory, $remarks);
 
     /**
-     * Hold a transaction by the curSignatory.
+     * Hold a transaction by the currentSignatory.
      *
      * @param  \Transaction $transaction
      * @param  \Signatory $signatory

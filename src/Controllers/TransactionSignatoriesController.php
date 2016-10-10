@@ -55,22 +55,22 @@ class TransactionSignatoriesController extends \Illuminate\Routing\Controller
             'transactionApprovals.user',
             'transactionApprovals.job',
             'transactionApprovals.signatoryAction',
-            'curSignatory',
+            'currentSignatory',
         ])->find($transactionId);
 
         $approvals = $transaction->transactionApprovals;
 
         $signatories = collection();
 
-        if ($transaction->curSignatory) {
+        if ($transaction->currentSignatory) {
             $signatories = $this->signatory
                 ->with([
                     'job',
                     'user',
                     'signatoryAction',
                 ])
-                ->where('signatory_set_id', $transaction->curSignatory->signatory_set_id)
-                ->where('hierarchy', '>', $transaction->curSignatory->hierarchy)
+                ->where('signatory_set_id', $transaction->currentSignatory->signatory_set_id)
+                ->where('hierarchy', '>', $transaction->currentSignatory->hierarchy)
                 ->get();
 
             foreach ($signatories as $signatory) {

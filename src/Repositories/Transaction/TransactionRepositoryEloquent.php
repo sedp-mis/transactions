@@ -111,24 +111,24 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
             $transaction->{$attrib} = $transaction->{$attrib} ?: $value;
         }
 
-        // Set relation curSignatory (fk: current_signatory) if not set
-        if (empty($transaction->curSignatory)) {
+        // Set relation currentSignatory (fk: current_signatory_id) if not set
+        if (empty($transaction->currentSignatory)) {
             if (empty($transaction->transaction_menu_id)) {
-                throw new InvalidArgumentException('Attribute transaction_menu_id does not exists in the given transaction. Cannot find signatorySet and current_signatory');
+                throw new InvalidArgumentException('Attribute transaction_menu_id does not exists in the given transaction. Cannot find signatorySet and currentSignatory');
             }
 
             $signatory = $this->menuSignatorySet->findSignatorySet($transaction->transaction_menu_id)->signatories->first();
-            $transaction->setRelation('curSignatory', $signatory);
+            $transaction->setRelation('currentSignatory', $signatory);
         }
 
-        // Set relation curUserSignatory (fk: current_user_signatory) if not set
-        if (empty($transaction->curUserSignatory)) {
-            $transaction->setRelation('curUserSignatory', $this->userResolver->getUser($transaction->curSignatory));
+        // Set relation currentUser (fk: current_user_id) if not set
+        if (empty($transaction->currentUser)) {
+            $transaction->setRelation('currentUser', $this->userResolver->getUser($transaction->currentSignatory));
         }
 
         // Make sure to save fks
-        $transaction->current_signatory      = $transaction->curSignatory->id;
-        $transaction->current_user_signatory = $transaction->curUserSignatory->id;
+        $transaction->current_signatory_id      = $transaction->currentSignatory->id;
+        $transaction->current_user_id = $transaction->currentUser->id;
 
         $this->save($transaction);
 
@@ -143,7 +143,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     protected function queueDefaultAttributes()
     {
         return [
-            'transacted_by' => get_user_session(),
+            'transacted_by_user_id' => get_user_session(),
             'status'        => 'Q',
             'transacted_at' => date('Y-m-d H:i:s'),
         ];
@@ -231,7 +231,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     {
         $documentTypeIds = $this->signatoryDocumentTypes->findDocumentTypes(
             $transaction->transaction_menu_id,
-            $transaction->curSignatory->id
+            $transaction->currentSignatory->id
         )->pluck('id');
 
         $collection = collection();
@@ -279,7 +279,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     }
 
     /**
-     * Accept a transaction by the curSignatory.
+     * Accept a transaction by the currentSignatory.
      *
      * @param  \SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
      * @param  \SedpMis\Transactions\Models\Interfaces\SignatoryInterface $signatory
@@ -288,13 +288,13 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
      */
     public function accept($transaction, $signatory = null, $remarks = '')
     {
-        $signatory = $signatory ?: $transaction->curSignatory;
+        $signatory = $signatory ?: $transaction->currentSignatory;
 
         $nextSignatory = $this->signatory->nextSignatory($signatory->id);
 
         if ($nextSignatory) {
-            $transaction->current_user_signatory = $this->userResolver->getUser($nextSignatory)->id;
-            $transaction->current_signatory      = $nextSignatory->id;
+            $transaction->current_user_id = $this->userResolver->getUser($nextSignatory)->id;
+            $transaction->current_signatory_id      = $nextSignatory->id;
             $transaction->status                 = 'Q';
             $transaction->save();
         } else {
@@ -313,7 +313,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     }
 
     /**
-     * Reject a transaction by the curSignatory.
+     * Reject a transaction by the currentSignatory.
      *
      * @param  \SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
      * @param  \SedpMis\Transactions\Models\Interfaces\SignatoryInterface $signatory
@@ -322,10 +322,10 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
      */
     public function reject($transaction, $signatory = null, $remarks = '')
     {
-        $signatory = $signatory ?: $transaction->curSignatory;
+        $signatory = $signatory ?: $transaction->currentSignatory;
 
-        $transaction->current_signatory      = $signatory->id;
-        $transaction->current_user_signatory = $this->userResolver->getUser($signatory)->id;
+        $transaction->current_signatory_id      = $signatory->id;
+        $transaction->current_user_id = $this->userResolver->getUser($signatory)->id;
         $transaction->status                 = 'R';
         $transaction->save();
 
@@ -336,7 +336,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     }
 
     /**
-     * Hold a transaction by the curSignatory.
+     * Hold a transaction by the currentSignatory.
      *
      * @param  \SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
      * @param  \SedpMis\Transactions\Models\Interfaces\SignatoryInterface $signatory
@@ -345,12 +345,12 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
      */
     public function hold($transaction, $signatory = null, $remarks = '')
     {
-        $signatory = $signatory ?: $transaction->curSignatory;
+        $signatory = $signatory ?: $transaction->currentSignatory;
 
         $transaction->status = 'Q';
-        if ($transaction->current_user_signatory != $this->userResolver->getUser($signatory)->id) {
-            $transaction->current_user_signatory = $this->userResolver->getUser($signatory)->id;
-            $transaction->current_signatory      = $signatory->id;
+        if ($transaction->current_user_id != $this->userResolver->getUser($signatory)->id) {
+            $transaction->current_user_id = $this->userResolver->getUser($signatory)->id;
+            $transaction->current_signatory_id      = $signatory->id;
         }
 
         $transaction->save();
