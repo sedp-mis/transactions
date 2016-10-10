@@ -28,6 +28,8 @@ class TransactionsController extends \SedpMis\BaseApi\BaseApiController
     {
         $this->repo    = $repo;
         $this->request = $request;
+
+        $this->repo->applyQueryParams($this->request);
     }
 
     /**
@@ -37,9 +39,9 @@ class TransactionsController extends \SedpMis\BaseApi\BaseApiController
      */
     public function pending()
     {
-        return $this->repo->applyQueryParams($this->request)->filters([
-            'current_user_signatory' => get_user_session(),
-            'status'                 => 'Q',
+        return $this->repo->filters([
+            'current_user_id' => get_user_session(),
+            'status'          => 'Q',
         ])
         ->get();
     }
@@ -51,8 +53,6 @@ class TransactionsController extends \SedpMis\BaseApi\BaseApiController
      */
     public function tracker()
     {
-        $this->repo->applyQueryParams($this->request);
-
         return $this->repo->getTrackedTransactions(get_user_session());
     }
 
@@ -63,8 +63,6 @@ class TransactionsController extends \SedpMis\BaseApi\BaseApiController
      */
     public function history()
     {
-        $this->repo->applyQueryParams($this->request);
-
         return $this->repo->getHistoricalTransactions(get_user_session());
     }
 }
