@@ -75,6 +75,15 @@ class TransactionSignatoriesController extends \Illuminate\Routing\Controller
 
             foreach ($signatories as $signatory) {
                 $signatory->setRelation('user', $this->userResolver->getUser($signatory));
+                if (is_null($signatory->job_id) && $signatory->user_id) {
+                    $signatory->setRelation('job', $signatory->user->job);
+
+                    if (method_exists($signatory->user, 'removeRelation')) {
+                        $signatory->user->removeRelation('job');
+                    } else {
+                        $signatory->user->setRelation('job', null);
+                    }
+                }
             }
         }
 
