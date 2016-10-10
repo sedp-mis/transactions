@@ -38,5 +38,4 @@ interface SignatoryInterface
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function job();
-
 }
