@@ -8,7 +8,6 @@ use SedpMis\Transactions\Interfaces\UserResolverInterface;
 
 class TransactionSignatoriesController extends \Illuminate\Routing\Controller
 {
-
     /**
      * Transaction model.
      *
@@ -50,13 +49,13 @@ class TransactionSignatoriesController extends \Illuminate\Routing\Controller
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public function index($transactionId)
-    {   
+    {
         $transaction = $this->transaction->with([
             'transactionApprovals.signatory',
             'transactionApprovals.user',
             'transactionApprovals.job',
             'transactionApprovals.signatoryAction',
-            'curSignatory'
+            'curSignatory',
         ])->find($transactionId);
 
         $approvals = $transaction->transactionApprovals;
@@ -68,7 +67,7 @@ class TransactionSignatoriesController extends \Illuminate\Routing\Controller
                 ->with([
                     'job',
                     'user',
-                    'signatoryAction'
+                    'signatoryAction',
                 ])
                 ->where('signatory_set_id', $transaction->curSignatory->signatory_set_id)
                 ->where('hierarchy', '>', $transaction->curSignatory->hierarchy)
