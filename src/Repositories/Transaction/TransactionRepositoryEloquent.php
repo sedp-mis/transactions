@@ -127,8 +127,8 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         }
 
         // Make sure to save fks
-        $transaction->current_signatory_id      = $transaction->currentSignatory->id;
-        $transaction->current_user_id = $transaction->currentUser->id;
+        $transaction->current_signatory_id = $transaction->currentSignatory->id;
+        $transaction->current_user_id      = $transaction->currentUser->id;
 
         $this->save($transaction);
 
@@ -144,8 +144,8 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     {
         return [
             'transacted_by_user_id' => get_user_session(),
-            'status'        => 'Q',
-            'transacted_at' => date('Y-m-d H:i:s'),
+            'status'                => 'Q',
+            'transacted_at'         => date('Y-m-d H:i:s'),
         ];
     }
 
@@ -293,9 +293,9 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         $nextSignatory = $this->signatory->nextSignatory($signatory->id);
 
         if ($nextSignatory) {
-            $transaction->current_user_id = $this->userResolver->getUser($nextSignatory)->id;
-            $transaction->current_signatory_id      = $nextSignatory->id;
-            $transaction->status                 = 'Q';
+            $transaction->current_user_id      = $this->userResolver->getUser($nextSignatory)->id;
+            $transaction->current_signatory_id = $nextSignatory->id;
+            $transaction->status               = 'Q';
             $transaction->save();
         } else {
             $transaction->status = 'A';
@@ -324,9 +324,9 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     {
         $signatory = $signatory ?: $transaction->currentSignatory;
 
-        $transaction->current_signatory_id      = $signatory->id;
-        $transaction->current_user_id = $this->userResolver->getUser($signatory)->id;
-        $transaction->status                 = 'R';
+        $transaction->current_signatory_id = $signatory->id;
+        $transaction->current_user_id      = $this->userResolver->getUser($signatory)->id;
+        $transaction->status               = 'R';
         $transaction->save();
 
         $this->createTransactionApproval($transaction, $signatory, 'R', $remarks);
@@ -349,8 +349,8 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
 
         $transaction->status = 'Q';
         if ($transaction->current_user_id != $this->userResolver->getUser($signatory)->id) {
-            $transaction->current_user_id = $this->userResolver->getUser($signatory)->id;
-            $transaction->current_signatory_id      = $signatory->id;
+            $transaction->current_user_id      = $this->userResolver->getUser($signatory)->id;
+            $transaction->current_signatory_id = $signatory->id;
         }
 
         $transaction->save();
