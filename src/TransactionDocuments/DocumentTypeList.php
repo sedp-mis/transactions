@@ -56,7 +56,7 @@ class DocumentTypeList implements DocumentListInterface
             $documentList->documentType = $documents->first()->documentType;
             $documentList->documents    = $documents;
 
-            if ($this->isForSignatory($transaction->transaction_menu_id, $documentList->documentType->id, $transaction->currentSignatory->id)) {
+            if ($this->isForSignatory($transaction->menu_id, $documentList->documentType->id, $transaction->currentSignatory->id)) {
                 $documentList->signatoryAction = $transaction->currentSignatory->signatoryAction;
             }
 

@@ -6,7 +6,7 @@ class Transaction extends \Eloquent
 {
     public function menu()
     {
-        return $this->belongsTo(Menu::class, 'transaction_menu_id');
+        return $this->belongsTo(Menu::class);
     }
 
     public function documents()

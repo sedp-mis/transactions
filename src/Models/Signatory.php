@@ -30,7 +30,7 @@ class Signatory extends \Eloquent
         return $query->join('transaction_document_signatories', function ($join) use ($documentTypeIds, $menuId) {
             $join
                 ->on('transaction_document_signatories.signatory_id', '=', 'signatories.id')
-                ->on('transaction_document_signatories.transaction_menu_id', '=', DB::raw($menuId))
+                ->on('transaction_document_signatories.menu_id', '=', DB::raw($menuId))
                 ->on('transaction_document_signatories.document_type_id', 'in', DB::raw('('.join(',', $documentTypeIds).')'));
         });
     }

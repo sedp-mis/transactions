@@ -75,7 +75,7 @@ class DocumentSignatoryRepositoryEloquent implements DocumentSignatoryRepository
         $signatories = Signatory::with('signatoryAction')
             ->where('signatory_set_id', $document->transaction->currentSignatory->signatory_set_id)
             ->whereRaw('id in (select signatory_id from transaction_document_signatories where '.
-                "transaction_menu_id = {$document->transaction->transaction_menu_id} and document_type_id = {$document->document_type_id})")
+                "menu_id = {$document->transaction->menu_id} and document_type_id = {$document->document_type_id})")
             ->skip($documentApprovals->count())
             ->limit(100)
             ->get();

@@ -113,11 +113,11 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
 
         // Set relation currentSignatory (fk: current_signatory_id) if not set
         if (empty($transaction->currentSignatory)) {
-            if (empty($transaction->transaction_menu_id)) {
-                throw new InvalidArgumentException('Attribute transaction_menu_id does not exists in the given transaction. Cannot find signatorySet and currentSignatory');
+            if (empty($transaction->menu_id)) {
+                throw new InvalidArgumentException('Attribute menu_id does not exists in the given transaction. Cannot find signatorySet and currentSignatory');
             }
 
-            $signatory = $this->menuSignatorySet->findSignatorySet($transaction->transaction_menu_id)->signatories->first();
+            $signatory = $this->menuSignatorySet->findSignatorySet($transaction->menu_id)->signatories->first();
             $transaction->setRelation('currentSignatory', $signatory);
         }
 
@@ -230,7 +230,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     protected function createDocumentApprovals($transaction, $signatory)
     {
         $documentTypeIds = $this->signatoryDocumentTypes->findDocumentTypes(
-            $transaction->transaction_menu_id,
+            $transaction->menu_id,
             $transaction->currentSignatory->id
         )->pluck('id');
 
@@ -308,7 +308,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
 
         // Fire event for final approved of transaction
         if ($transaction->status === 'A') {
-            Event::fire("transaction_approval.{$transaction->transaction_menu_id}.approved", [$transaction]);
+            Event::fire("transaction_approval.{$transaction->menu_id}.approved", [$transaction]);
         }
     }
 
@@ -332,7 +332,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         $this->createTransactionApproval($transaction, $signatory, 'R', $remarks);
 
         // Fire event for rejected of transaction
-        Event::fire("transaction_approval.{$transaction->transaction_menu_id}.rejected", [$transaction]);
+        Event::fire("transaction_approval.{$transaction->menu_id}.rejected", [$transaction]);
     }
 
     /**
