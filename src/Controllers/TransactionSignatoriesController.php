@@ -64,7 +64,13 @@ class TransactionSignatoriesController extends \Illuminate\Routing\Controller
         $signatories = collection();
 
         if ($transaction->curSignatory) {
-            $signatories = $this->signatory->where('signatory_set_id', $transaction->curSignatory->signatory_set_id)
+            $signatories = $this->signatory
+                ->with([
+                    'job',
+                    'user',
+                    'signatoryAction'
+                ])
+                ->where('signatory_set_id', $transaction->curSignatory->signatory_set_id)
                 ->where('hierarchy', '>', $transaction->curSignatory->hierarchy)
                 ->get();
 
