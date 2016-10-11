@@ -299,6 +299,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
             $transaction->save();
         } else {
             $transaction->status = 'A';
+            $transaction->approved_at = date('Y-m-d H:i:s');
         }
 
         $transaction->save();
@@ -327,6 +328,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         $transaction->current_signatory_id = $signatory->id;
         $transaction->current_user_id      = $this->userResolver->getUser($signatory)->id;
         $transaction->status               = 'R';
+        $transaction->rejected_at          = date('Y-m-d H:i:s');
         $transaction->save();
 
         $this->createTransactionApproval($transaction, $signatory, 'R', $remarks);
