@@ -349,11 +349,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     {
         $signatory = $signatory ?: $transaction->currentSignatory;
 
-        $transaction->status = 'Q';
-        if ($transaction->current_user_id != $this->userResolver->getUser($signatory)->id) {
-            $transaction->current_user_id      = $this->userResolver->getUser($signatory)->id;
-            $transaction->current_signatory_id = $signatory->id;
-        }
+        $transaction->status = 'H';
 
         $transaction->save();
 
