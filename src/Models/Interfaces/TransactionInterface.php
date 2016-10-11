@@ -48,8 +48,17 @@ interface TransactionInterface
 
     /**
      * Reference transaction for reversal transaction.
+     * Inverse of reversalTransactions.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function referenceTransaction();
+
+    /**
+     * Reversal transactions relation.
+     * Inverse of referenceTransaction.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function reversalTransactions();
 }

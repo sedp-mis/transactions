@@ -298,7 +298,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
             $transaction->status               = 'Q';
             $transaction->save();
         } else {
-            $transaction->status = 'A';
+            $transaction->status      = 'A';
             $transaction->approved_at = date('Y-m-d H:i:s');
         }
 
@@ -339,6 +339,10 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
 
     /**
      * Hold a transaction by the currentSignatory.
+     * Be aware that a transaction can be hold by the system (not by signatory) in case there is a
+     * transaction reversal for that transaction. In that case only status is set to H and has no record
+     * in transaction approvals. The reference for that kind of transaction
+     * is via the ref_transaction_id (reversalTransactions relation, referenceTransaction is the inverse of relation).
      *
      * @param  \SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
      * @param  \SedpMis\Transactions\Models\Interfaces\SignatoryInterface $signatory
