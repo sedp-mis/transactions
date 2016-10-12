@@ -54,7 +54,7 @@ class TransactionsController extends \SedpMis\BaseApi\BaseApiController
     public function approved()
     {
         return $this->repo->filters([
-            'status'          => 'A',
+            'status' => 'A',
         ])
         ->get();
     }
