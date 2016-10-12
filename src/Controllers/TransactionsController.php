@@ -47,6 +47,19 @@ class TransactionsController extends \SedpMis\BaseApi\BaseApiController
     }
 
     /**
+     * Return the approved transactions.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function approved()
+    {
+        return $this->repo->filters([
+            'status'          => 'A',
+        ])
+        ->get();
+    }
+
+    /**
      * Return transactions which is currently in queue, for live-tracking.
      *
      * @return \Illuminate\Database\Eloquent\Collection
