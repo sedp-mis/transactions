@@ -45,4 +45,11 @@ interface SignatoryRepositoryInterface
      * @return collection
      */
     public function signatoryFromHierarchy($signatorySetId, $hierarchy);
+
+    /**
+     * Return the default reversal signatory set.
+     *
+     * @return \SedpMis\Transactions\Models\Interfaces\SignatorySetInterface
+     */
+    public function defaultReversalSignatorySet();
 }

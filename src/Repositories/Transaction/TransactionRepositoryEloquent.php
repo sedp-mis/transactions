@@ -111,6 +111,13 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
             $transaction->{$attrib} = $transaction->{$attrib} ?: $value;
         }
 
+        // Set the default reversal signatory set for reversal transaction.
+        if ($transaction->is_reversal && empty($transaction->currentSignatory)) {
+            $signatory = $this->signatory->defaultReversalSignatorySet()->signatories->first();
+
+            $transaction->setRelation('currentSignatory', $signatory);
+        }
+
         // Set relation currentSignatory (fk: current_signatory_id) if not set
         if (empty($transaction->currentSignatory)) {
             if (empty($transaction->menu_id)) {

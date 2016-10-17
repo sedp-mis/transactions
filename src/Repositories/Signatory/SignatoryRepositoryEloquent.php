@@ -5,17 +5,27 @@ namespace SedpMis\Transactions\Repositories\Signatory;
 use SedpMis\BaseRepository\RepositoryInterface;
 use SedpMis\BaseRepository\BaseRepositoryEloquent;
 use SedpMis\Transactions\Models\Interfaces\SignatoryInterface;
+use SedpMis\Transactions\Models\Interfaces\SignatorySetInterface;
 
 class SignatoryRepositoryEloquent extends BaseRepositoryEloquent implements SignatoryRepositoryInterface, RepositoryInterface
 {
     /**
+     * Signatory set model.
+     *
+     * @var \SedpMis\Transactions\Models\Interfaces\SignatorySetInterface
+     */
+    protected $signatorySet;
+
+    /**
      * Construct.
      *
      * @param \SedpMis\Transactions\Models\Interfaces\SignatoryInterface $model
+     * @param \SedpMis\Transactions\Models\Interfaces\SignatorySetInterface $signatorySet
      */
-    public function __construct(SignatoryInterface $model)
+    public function __construct(SignatoryInterface $model, SignatorySetInterface $signatorySet)
     {
-        $this->model = $model;
+        $this->model        = $model;
+        $this->signatorySet = $signatorySet;
     }
 
     /**
@@ -82,5 +92,15 @@ class SignatoryRepositoryEloquent extends BaseRepositoryEloquent implements Sign
 
         return $this->eagerLoadRelations()->fromHierarchy($signatorySetId, $hierarchy)
             ->get();
+    }
+
+    /**
+     * Return the default reversal signatory set.
+     *
+     * @return \SedpMis\Transactions\Models\Interfaces\SignatorySetInterface
+     */
+    public function defaultReversalSignatorySet()
+    {
+        return $this->signatorySet->where('is_reversal_signatory_set', 1)->first();
     }
 }
