@@ -83,7 +83,11 @@ class TransactionActionController extends \Illuminate\Routing\Controller
 
         $user = $this->user->find(get_user_session());
 
-        if ($transaction->current_user_id != $user->id && $transaction->lastTransactionApproval->user_id != $user->id) {
+        if (
+            $transaction->current_user_id != $user->id &&
+            $transaction->lastTransactionApproval &&
+            $transaction->lastTransactionApproval->user_id != $user->id
+        ) {
             throw App::make('sedpmis-transaction.validation_exception', 'Cannot set action on transaction if user is not the current or previous user_signatory.');
         }
 
