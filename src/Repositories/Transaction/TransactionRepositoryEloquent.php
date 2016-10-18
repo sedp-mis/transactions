@@ -73,8 +73,6 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
 
         $this->signatory = $signatory;
 
-        $this->userResolver = $userResolver;
-
         $this->menuSignatorySet = $menuSignatorySet;
 
         $this->documentApproval = $documentApproval;
