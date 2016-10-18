@@ -84,7 +84,7 @@ class TransactionActionController extends \Illuminate\Routing\Controller
         $user = $this->user->find(get_user_session());
 
         if (!$this->isUserAllowedForAction($transaction, $user)) {
-            throw App::make('sedpmis-transaction.validation_exception', 'Cannot set action on transaction if user is not the current or previous user_signatory.');
+            throw App::make('sedpmis-transaction.validation_exception', 'Cannot set action on transaction if user is not the current or previous user signatory.');
         }
 
         // Assign the signatory that set an action to the transaction
