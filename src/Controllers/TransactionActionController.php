@@ -79,7 +79,7 @@ class TransactionActionController extends \Illuminate\Routing\Controller
             'currentSignatory.signatoryAction',
             'currentUser',
             'lastTransactionApproval.signatoryAction',
-            ])->find($transactionId);
+            ])->findOrFail($transactionId);
 
         $user = $this->user->find(get_user_session());
 
