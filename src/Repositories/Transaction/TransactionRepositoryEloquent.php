@@ -8,7 +8,6 @@ use SedpMis\Transactions\Models\Interfaces\DocumentApprovalInterface;
 use SedpMis\Transactions\Interfaces\SignatoryDocumentTypesInterface;
 use SedpMis\Transactions\Models\Interfaces\TransactionInterface;
 use SedpMis\Transactions\Interfaces\MenuSignatorySetInterface;
-use SedpMis\Transactions\Interfaces\UserResolverInterface;
 use SedpMis\BaseRepository\BaseBranchRepositoryEloquent;
 use SedpMis\BaseRepository\RepositoryInterface;
 use SedpMis\Transactions\Models\SignatorySet;
@@ -30,13 +29,6 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
      * @var \SedpMis\Transactions\Models\Interfaces\TransactionApprovalInterface
      */
     protected $transactionApproval;
-
-    /**
-     * User resolver.
-     *
-     * @var \SedpMis\Transactions\Interfaces\UserResolverInterface
-     */
-    protected $userResolver;
 
     /**
      * Signatory document types repository.
@@ -63,7 +55,6 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
      * Construct.
      *
      * @param TransactionInterface            $model
-     * @param UserResolverInterface           $userResolver
      * @param SignatoryRepositoryInterface    $signatory
      * @param DocumentApprovalInterface       $documentApproval
      * @param MenuSignatorySetInterface       $menuSignatorySet
@@ -72,7 +63,6 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
      */
     public function __construct(
         TransactionInterface $model,
-        UserResolverInterface $userResolver,
         SignatoryRepositoryInterface $signatory,
         DocumentApprovalInterface $documentApproval,
         MenuSignatorySetInterface $menuSignatorySet,
@@ -130,7 +120,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
 
         // Set relation currentUser (fk: current_user_id) if not set
         if (empty($transaction->currentUser)) {
-            $transaction->setRelation('currentUser', $this->userResolver->getUser($transaction->currentSignatory));
+            $transaction->setRelation('currentUser', $signatory->getUser());
         }
 
         // Make sure to save fks
@@ -254,8 +244,8 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
             if (in_array($document->document_type_id, $documentTypeIds)) {
                 $collection[] = $this->documentApproval->firstOrCreate([
                     'document_id'         => $document->id,
-                    'user_id'             => $this->userResolver->getUser($signatory)->id,
-                    'job_id'              => $this->userResolver->getUser($signatory)->job_id,
+                    'user_id'             => $signatory->getUser()->id,
+                    'job_id'              => $signatory->getUser()->job_id,
                     'signatory_action_id' => $signatory->signatoryAction->id,
                 ]);
             }
@@ -278,8 +268,8 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         return $this->transactionApproval->create([
             'transaction_id'      => $transaction->id,
             'signatory_id'        => $signatory->id,
-            'user_id'             => $this->userResolver->getUser($signatory)->id,
-            'job_id'              => $this->userResolver->getUser($signatory)->job_id,
+            'user_id'             => $signatory->getUser()->id,
+            'job_id'              => $signatory->getUser()->job_id,
             'signatory_action_id' => $signatory->signatoryAction->id,
             'status'              => $action,
             'remarks'             => $remarks,
@@ -301,7 +291,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         $nextSignatory = $this->signatory->nextSignatory($signatory->id);
 
         if ($nextSignatory) {
-            $transaction->current_user_id      = $this->userResolver->getUser($nextSignatory)->id;
+            $transaction->current_user_id      = $signatory->getUser()->id;
             $transaction->current_signatory_id = $nextSignatory->id;
             $transaction->status               = 'Q';
             $transaction->save();
@@ -334,7 +324,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         $signatory = $signatory ?: $transaction->currentSignatory;
 
         $transaction->current_signatory_id = $signatory->id;
-        $transaction->current_user_id      = $this->userResolver->getUser($signatory)->id;
+        $transaction->current_user_id      = $signatory->getUser()->id;
         $transaction->status               = 'R';
         $transaction->rejected_at          = date('Y-m-d H:i:s');
         $transaction->save();
@@ -362,8 +352,8 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         $signatory = $signatory ?: $transaction->currentSignatory;
 
         $transaction->status = 'Q';
-        if ($transaction->current_user_id != $this->userResolver->getUser($signatory)->id) {
-            $transaction->current_user_id      = $this->userResolver->getUser($signatory)->id;
+        if ($transaction->current_user_id != $signatory->getUser()->id) {
+            $transaction->current_user_id      = $signatory->getUser()->id;
             $transaction->current_signatory_id = $signatory->id;
         }
 
