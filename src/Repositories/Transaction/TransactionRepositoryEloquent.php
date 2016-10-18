@@ -150,6 +150,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     protected function queueDefaultAttributes()
     {
         return [
+            'branch_id'             => get_branch_session(),
             'transacted_by_user_id' => get_user_session(),
             'status'                => 'Q',
             'transacted_at'         => date('Y-m-d H:i:s'),
