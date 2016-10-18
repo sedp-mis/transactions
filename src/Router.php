@@ -20,5 +20,6 @@ class Router
         Route::get('transactions/history', '\SedpMis\Transactions\Controllers\TransactionsController@history');
         Route::get('transactions/{transaction}', '\SedpMis\Transactions\Controllers\TransactionsController@show');
         Route::get('transactions/{transaction}/signatories', 'SedpMis\Transactions\Controllers\TransactionSignatoriesController@index');
+        Route::get('transactions/{transaction}/document_list', 'SedpMis\Transactions\Controllers\TransactionDocumentsController@documentList');
     }
 }
