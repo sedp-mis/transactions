@@ -4,6 +4,7 @@ namespace SedpMis\Transactions\Repositories\Signatory;
 
 use SedpMis\BaseRepository\RepositoryInterface;
 use SedpMis\BaseRepository\BaseRepositoryEloquent;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use SedpMis\Transactions\Models\Interfaces\SignatoryInterface;
 use SedpMis\Transactions\Models\Interfaces\SignatorySetInterface;
 
@@ -101,6 +102,12 @@ class SignatoryRepositoryEloquent extends BaseRepositoryEloquent implements Sign
      */
     public function defaultReversalSignatorySet()
     {
-        return $this->signatorySet->where('is_for_reversal', 1)->firstOrFail();
+        $signatorySet = $this->signatorySet->where('is_for_reversal', 1)->first();
+
+        if (is_null($signatorySet)) {
+            throw new ModelNotFoundException("Default reversal signatory set is not found.");
+        }
+
+        return $signatorySet;
     }
 }
