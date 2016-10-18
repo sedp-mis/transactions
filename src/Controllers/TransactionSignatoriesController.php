@@ -47,7 +47,7 @@ class TransactionSignatoriesController extends \Illuminate\Routing\Controller
             'transactionApprovals.job',
             'transactionApprovals.signatoryAction',
             'currentSignatory',
-        ])->find($transactionId);
+        ])->findOrFail($transactionId);
 
         $approvals = $transaction->transactionApprovals;
 
