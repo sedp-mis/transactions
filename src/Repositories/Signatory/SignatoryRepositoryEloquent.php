@@ -105,7 +105,7 @@ class SignatoryRepositoryEloquent extends BaseRepositoryEloquent implements Sign
         $signatorySet = $this->signatorySet->where('is_for_reversal', 1)->first();
 
         if (is_null($signatorySet)) {
-            throw new ModelNotFoundException("Default reversal signatory set is not found.");
+            throw new ModelNotFoundException('Default reversal signatory set is not found.');
         }
 
         return $signatorySet;
