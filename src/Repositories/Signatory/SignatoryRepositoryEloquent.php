@@ -101,6 +101,6 @@ class SignatoryRepositoryEloquent extends BaseRepositoryEloquent implements Sign
      */
     public function defaultReversalSignatorySet()
     {
-        return $this->signatorySet->where('is_reversal_signatory_set', 1)->firstOrFail();
+        return $this->signatorySet->where('is_for_reversal', 1)->firstOrFail();
     }
 }
