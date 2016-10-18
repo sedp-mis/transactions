@@ -4,7 +4,6 @@ namespace SedpMis\Transactions\Controllers;
 
 use SedpMis\Transactions\Models\Interfaces\TransactionInterface;
 use SedpMis\Transactions\Models\Interfaces\SignatoryInterface;
-use SedpMis\Transactions\Interfaces\UserResolverInterface;
 
 class TransactionSignatoriesController extends \Illuminate\Routing\Controller
 {
@@ -23,23 +22,15 @@ class TransactionSignatoriesController extends \Illuminate\Routing\Controller
     protected $signatory;
 
     /**
-     * User signatory resolver.
-     *
-     * @var \SedpMis\Transactions\Interfaces\UserResolverInterface
-     */
-    protected $userResolver;
-
-    /**
      * Construct.
      *
      * @param TransactionInterface $transaction
      * @param SignatoryInterface   $signatory
      */
-    public function __construct(TransactionInterface $transaction, SignatoryInterface $signatory, UserResolverInterface $userResolver)
+    public function __construct(TransactionInterface $transaction, SignatoryInterface $signatory)
     {
-        $this->transaction  = $transaction;
-        $this->signatory    = $signatory;
-        $this->userResolver = $userResolver;
+        $this->transaction = $transaction;
+        $this->signatory   = $signatory;
     }
 
     /**
@@ -79,7 +70,7 @@ class TransactionSignatoriesController extends \Illuminate\Routing\Controller
             $signatories = $query->get();
 
             foreach ($signatories as $signatory) {
-                $signatory->setRelation('user', $this->userResolver->getUser($signatory));
+                $signatory->setRelation('user', $signatory->getUser());
                 if (is_null($signatory->job_id) && $signatory->user_id) {
                     $signatory->setRelation('job', $signatory->user->job);
 
