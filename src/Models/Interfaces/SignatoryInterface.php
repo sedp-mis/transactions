@@ -31,4 +31,11 @@ interface SignatoryInterface
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function job();
+
+    /**
+     * Return the signatory's user.
+     *
+     * @return \SedpMis\Transactions\Models\Interfaces\UserInterface
+     */
+    public function getUser();
 }
