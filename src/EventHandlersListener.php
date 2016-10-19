@@ -8,13 +8,6 @@ use SedpMis\Transactions\Models\Interfaces\TransactionEventHandlerInterface;
 class EventHandlersListener
 {
     /**
-     * Identifier if this is already listening to events.
-     *
-     * @var bool
-     */
-    public static $listening = false;
-
-    /**
      * Events on transaction approval.
      *
      * @var array
@@ -50,11 +43,6 @@ class EventHandlersListener
      */
     public function listen()
     {
-        // Check if already listening.
-        if (static::$listening) {
-            return;
-        }
-
         $eventHandlers = $this->transactionEventHandler->with(['menus' => function ($query) {
             $query->select('menus.id', 'transaction_event_handler_id', 'name');
         }])->has('menus')->get();
@@ -66,7 +54,5 @@ class EventHandlersListener
                 }
             }
         }
-
-        static::$listening = true;
     }
 }
