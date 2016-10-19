@@ -305,6 +305,16 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
 
         // Fire event for final approved of transaction
         if ($transaction->status === 'A') {
+            // Manage reversing reference transaction by rejecting it.
+            if ($transaction->is_reversal && $transaction->referenceTransaction) {
+                $referenceTransaction = $transaction->referenceTransaction;
+
+                $referenceTransaction->status                = 'R';
+                $referenceTransaction->rev_by_transaction_id = $transaction->id;
+                $referenceTransaction->rejected_at           = datetime('Y-m-d H:i:s');
+                $referenceTransaction->save();
+            }
+
             Event::fire("transaction_approval.{$transaction->menu_id}.approved", [$transaction]);
         }
     }
@@ -328,6 +338,14 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         $transaction->save();
 
         $this->createTransactionApproval($transaction, $signatory, 'R', $remarks);
+
+        // Unhold reference transaction, bringing it back to queue.
+        if ($transaction->is_reversal && $transaction->referenceTransaction) {
+            $referenceTransaction = $transaction->referenceTransaction;
+
+            $referenceTransaction->status = 'Q';
+            $referenceTransaction->save();
+        }
 
         // Fire event for rejected of transaction
         Event::fire("transaction_approval.{$transaction->menu_id}.rejected", [$transaction]);

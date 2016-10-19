@@ -61,4 +61,11 @@ interface TransactionInterface
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function reversalTransactions();
+
+    /**
+     * Reversal transaction that causes a transaction to be reversed.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function reversedByTransaction();
 }
