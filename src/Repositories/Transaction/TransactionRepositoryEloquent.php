@@ -10,6 +10,7 @@ use SedpMis\Transactions\Models\Interfaces\TransactionInterface;
 use SedpMis\Transactions\Interfaces\MenuSignatorySetInterface;
 use SedpMis\BaseRepository\BaseBranchRepositoryEloquent;
 use SedpMis\BaseRepository\RepositoryInterface;
+use SedpMis\Transactions\EventHandlersListener;
 use SedpMis\Transactions\Models\SignatorySet;
 use Illuminate\Support\Facades\Event;
 use InvalidArgumentException;
@@ -58,6 +59,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
      * @param SignatoryRepositoryInterface    $signatory
      * @param DocumentApprovalInterface       $documentApproval
      * @param MenuSignatorySetInterface       $menuSignatorySet
+     * @param EventHandlersListener           $eventHandlersListener
      * @param TransactionApprovalInterface    $transactionApproval
      * @param SignatoryDocumentTypesInterface $signatoryDocumentTypes
      */
@@ -66,6 +68,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         SignatoryRepositoryInterface $signatory,
         DocumentApprovalInterface $documentApproval,
         MenuSignatorySetInterface $menuSignatorySet,
+        EventHandlersListener $eventHandlersListener,
         TransactionApprovalInterface $transactionApproval,
         SignatoryDocumentTypesInterface $signatoryDocumentTypes
     ) {
@@ -80,6 +83,8 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         $this->transactionApproval = $transactionApproval;
 
         $this->signatoryDocumentTypes = $signatoryDocumentTypes;
+
+        $eventHandlersListener->listen();
     }
 
     /**
