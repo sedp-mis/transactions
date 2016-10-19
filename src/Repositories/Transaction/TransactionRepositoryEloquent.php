@@ -305,7 +305,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
 
         // Fire event for final approved of transaction
         if ($transaction->status === 'A') {
-            // Manage reversing reference transaction by rejecting it.
+            // Reverse reference transaction by rejecting it.
             if ($transaction->is_reversal && $transaction->referenceTransaction) {
                 $referenceTransaction = $transaction->referenceTransaction;
 
