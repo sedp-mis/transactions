@@ -50,7 +50,7 @@ class EventHandlersListener
         foreach ($eventHandlers as $eventHandler) {
             foreach ($eventHandler->menus as $menu) {
                 foreach ($this->events as $event) {
-                    Event::listen("transaction_approval.{$menu->id}.{$event}", "{$path}@{$event}", $eventHandler->priority);
+                    Event::listen("transaction_approval.{$menu->id}.{$event}", "{$eventHandler->class_path}@{$event}", $eventHandler->priority);
                 }
             }
         }
