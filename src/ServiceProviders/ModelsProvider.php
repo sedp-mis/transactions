@@ -16,7 +16,7 @@ class ModelsProvider extends \Illuminate\Support\ServiceProvider
             'DocumentApproval',
             'User',
             'Menu',
-            'TransactionEventHandler'
+            'TransactionEventHandler',
         ];
 
         foreach ($models as $model) {

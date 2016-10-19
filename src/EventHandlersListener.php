@@ -2,7 +2,6 @@
 
 namespace SedpMis\Transactions;
 
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Event;
 use SedpMis\Transactions\Models\Interfaces\TransactionEventHandlerInterface;
 
@@ -17,7 +16,7 @@ class EventHandlersListener
         'approving',
         'approved',
         'rejecting',
-        'rejected'
+        'rejected',
     ];
 
     /**
