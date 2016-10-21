@@ -62,7 +62,10 @@ class DocumentTypeList implements DocumentListInterface
                 $documentList->signatoryAction = $transaction->currentSignatory->signatoryAction;
             }
 
-            $documentList->link = (new DocumentLinkFactory)->make($documentList->documentType)->link($transaction, $documents->first());
+            $documentList->link = (new DocumentLinkFactory)->make($documentList->documentType)->link(
+                $transaction->is_reversal && $transaction->referenceTransaction ? $transaction->referenceTransaction : $transaction,
+                $documents->first()
+            );
 
             $documentLists[] = $documentList;
         }
