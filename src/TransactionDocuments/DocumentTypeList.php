@@ -52,6 +52,8 @@ class DocumentTypeList implements DocumentListInterface
         foreach ($this->getDocuments($transaction)->groupBy('document_type_id') as $documents) {
             $documentList = new static;
 
+            $documents = collection($documents);
+
             // Set relation models.
             $documentList->documentType = $documents->first()->documentType;
             $documentList->documents    = $documents;
