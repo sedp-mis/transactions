@@ -294,7 +294,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         $nextSignatory = $this->signatory->nextSignatory($signatory->id);
 
         if ($nextSignatory) {
-            $transaction->current_user_id      = $signatory->getUser()->id;
+            $transaction->current_user_id      = $nextSignatory->getUser()->id;
             $transaction->current_signatory_id = $nextSignatory->id;
             $transaction->status               = 'Q';
             $transaction->save();
