@@ -24,7 +24,7 @@ class DefaultDocumentListFormatter implements DocumentListFormatterInterface
             'open_via'       => 'pdf',
             'sig_act_id'     => $documentList->signatoryAction ? $documentList->signatoryAction->id : null,
             'sig_act_name'   => $documentList->signatoryAction ? $documentList->signatoryAction->name : null,
-            'link'           => $documentList->link
+            'link'           => $documentList->link,
         ];
     }
 }
