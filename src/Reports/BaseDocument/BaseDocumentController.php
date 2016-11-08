@@ -42,11 +42,39 @@ abstract class BaseDocumentController extends \Illuminate\Routing\Controller
     ) {
         $this->documentTypeSignatory = $documentTypeSignatory;
         $this->transaction           = $transaction;
+
+        $this->boot();
     }
 
+    /**
+     * Boot anything in the controller.
+     *
+     * @return void
+     */
+    protected function boot()
+    {
+        // Nothing here.
+    }
+
+    /**
+     * Return the document type ids.
+     *
+     * @return array
+     */
+    public function getDocumentTypeIds()
+    {
+        return $this->documentTypeIds;
+    }
+
+    /**
+     * Show the document(s).
+     *
+     * @param  int $transactionId
+     * @return void
+     */
     public function show($transactionId)
     {
-        $transaction = $this->transaction->withDocumentTypes($this->documentTypeIds)
+        $transaction = $this->transaction->withDocumentTypes($this->getDocumentTypeIds())
             ->with(array_merge([
                 'branch',
                 'menu',
@@ -72,5 +100,11 @@ abstract class BaseDocumentController extends \Illuminate\Routing\Controller
         return $this->loadReportPdf($transaction);
     }
 
+    /**
+     * Load pdf report.
+     *
+     * @param  \SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
+     * @return void
+     */
     abstract public function loadReportPdf($transaction);
 }
