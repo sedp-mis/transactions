@@ -14,6 +14,12 @@ use SedpMis\Transactions\EventHandlersListener;
 use SedpMis\Transactions\Models\SignatorySet;
 use Illuminate\Support\Facades\Event;
 use InvalidArgumentException;
+use AccountingPeriod;
+use JournalHead;
+use JournalEntry;
+use Document;
+use Payee;
+use Receipt;
 
 class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent implements RepositoryInterface, TransactionRepositoryInterface
 {
