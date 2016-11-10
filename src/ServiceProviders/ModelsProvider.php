@@ -13,6 +13,7 @@ class ModelsProvider extends \Illuminate\Support\ServiceProvider
             'TransactionApproval',
             'Signatory',
             'SignatorySet',
+            'Document',
             'DocumentApproval',
             'DocumentSignatory',
             'User',
