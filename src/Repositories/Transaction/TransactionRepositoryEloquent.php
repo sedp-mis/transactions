@@ -5,7 +5,6 @@ namespace SedpMis\Transactions\Repositories\Transaction;
 use SedpMis\Transactions\Repositories\Signatory\SignatoryRepositoryInterface;
 use SedpMis\Transactions\Models\Interfaces\TransactionApprovalInterface;
 use SedpMis\Transactions\Models\Interfaces\DocumentSignatoryInterface;
-use SedpMis\Transactions\Interfaces\SignatoryDocumentTypesInterface;
 use SedpMis\Transactions\Models\Interfaces\TransactionInterface;
 use SedpMis\Transactions\Interfaces\MenuSignatorySetInterface;
 use SedpMis\BaseRepository\BaseBranchRepositoryEloquent;
