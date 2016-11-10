@@ -156,8 +156,6 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
                 $documentSignatory->save(); // subject for optimization, use single update query
             }
         }
-
-        return $collection;
     }
 
     /**
