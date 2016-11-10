@@ -59,6 +59,7 @@ class DocumentGenerator
         SignatoryRepositoryInterface $signatory
     ) {
         $this->document          = $document;
+        $this->signatory         = $signatory;
         $this->documentType      = $documentType;
         $this->documentSignatory = $documentSignatory;
     }
