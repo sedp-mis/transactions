@@ -121,9 +121,9 @@ class SignatoryRepositoryEloquent extends BaseRepositoryEloquent implements Sign
      */
     public function findDocumentTypeSignatories($transaction, $documentTypes)
     {
-        $configs = DB::table('transaction_document_signatories')->where('menu_id', $transaction->menu_id)
+        $configs = $this->model->newCollection(DB::table('transaction_document_signatories')->where('menu_id', $transaction->menu_id)
             ->whereIn('document_type_id', $documentTypes->lists('id'))
-            ->get();
+            ->get());
 
         $signatories = $this->model->find($configs->lists('signatory_id'));
 
