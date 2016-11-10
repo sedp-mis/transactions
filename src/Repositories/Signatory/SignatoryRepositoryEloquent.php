@@ -125,7 +125,7 @@ class SignatoryRepositoryEloquent extends BaseRepositoryEloquent implements Sign
             ->whereIn('document_type_id', array_unique($documentTypes->lists('id')))
             ->get());
 
-        $signatories = $this->model->find(array_unique($configs->lists('signatory_id')));
+        $signatories = $this->model->find(array_unique($configs->lists('signatory_id')))->orderBy('hierarchy');
 
         foreach ($signatories as $signatory) {
             $documentTypeIds = $configs->filter(function ($config) use ($signatory) {
