@@ -146,7 +146,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
      */
     protected function signDocumentSignatories($documents, $signatory)
     {
-        foreach ($transaction->documents as $document) {
+        foreach ($documents as $document) {
             $documentSignatories = $document->documentSignatories->filter(function ($documentSignatory) use ($signatory) {
                 return $signatory->id == $documentSignatory->signatory_id;
             });
