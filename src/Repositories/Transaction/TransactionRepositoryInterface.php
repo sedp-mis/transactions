@@ -13,16 +13,6 @@ interface TransactionRepositoryInterface
     public function queue($transaction);
 
     /**
-     * Save the accounting document of a transaction.
-     *
-     * @param  int $transactionId
-     * @param  array|\Modules\Transaction\Data\AccountingDocument $acctDoc
-     * @param  int $documentTypeId
-     * @return \Document
-     */
-    public function saveAccountingDocument($transactionId, $acctDoc, $documentTypeId = null);
-
-    /**
      * Accept a transaction by the currentSignatory.
      *
      * @param  \Transaction $transaction
