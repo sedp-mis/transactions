@@ -4,7 +4,7 @@ namespace SedpMis\Transactions\Repositories\Transaction;
 
 use SedpMis\Transactions\Repositories\Signatory\SignatoryRepositoryInterface;
 use SedpMis\Transactions\Models\Interfaces\TransactionApprovalInterface;
-use SedpMis\Transactions\Models\Interfaces\DocumentApprovalInterface;
+use SedpMis\Transactions\Models\Interfaces\DocumentSignatoryInterface;
 use SedpMis\Transactions\Interfaces\SignatoryDocumentTypesInterface;
 use SedpMis\Transactions\Models\Interfaces\TransactionInterface;
 use SedpMis\Transactions\Interfaces\MenuSignatorySetInterface;
@@ -32,18 +32,11 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     protected $transactionApproval;
 
     /**
-     * Signatory document types repository.
+     * DocumentSignatory model.
      *
-     * @var \SedpMis\Transactions\Interfaces\SignatoryDocumentTypesInterface
+     * @var \SedpMis\Transactions\Models\Interfaces\DocumentSignatoryInterface
      */
-    protected $signatoryDocumentTypes;
-
-    /**
-     * DocumentApproval model.
-     *
-     * @var \SedpMis\Transactions\Models\Interfaces\DocumentApprovalInterface
-     */
-    protected $documentApproval;
+    protected $documentSignatory;
 
     /**
      * Menu's signatorySet repository.
@@ -57,20 +50,18 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
      *
      * @param TransactionInterface            $model
      * @param SignatoryRepositoryInterface    $signatory
-     * @param DocumentApprovalInterface       $documentApproval
+     * @param DocumentSignatoryInterface      $documentSignatory
      * @param MenuSignatorySetInterface       $menuSignatorySet
      * @param EventHandlersListener           $eventHandlersListener
      * @param TransactionApprovalInterface    $transactionApproval
-     * @param SignatoryDocumentTypesInterface $signatoryDocumentTypes
      */
     public function __construct(
         TransactionInterface $model,
         SignatoryRepositoryInterface $signatory,
-        DocumentApprovalInterface $documentApproval,
+        DocumentSignatoryInterface $documentSignatory,
         MenuSignatorySetInterface $menuSignatorySet,
         EventHandlersListener $eventHandlersListener,
-        TransactionApprovalInterface $transactionApproval,
-        SignatoryDocumentTypesInterface $signatoryDocumentTypes
+        TransactionApprovalInterface $transactionApproval
     ) {
         $this->model = $model;
 
@@ -78,11 +69,9 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
 
         $this->menuSignatorySet = $menuSignatorySet;
 
-        $this->documentApproval = $documentApproval;
+        $this->documentSignatory = $documentSignatory;
 
         $this->transactionApproval = $transactionApproval;
-
-        $this->signatoryDocumentTypes = $signatoryDocumentTypes;
 
         $eventHandlersListener->listen();
     }
@@ -150,35 +139,22 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     }
 
     /**
-     * Create document approvals for documents of transaction.
+     * Sign document signatories.
      *
-     * @param  \SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
+     * @param  \Illuminate\Database\Eloquent\Collection $documents
      * @param  \SedpMis\Transactions\Models\Interfaces\SignatoryInterface $signatory
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return void
      */
-    protected function createDocumentApprovals($transaction, $signatory)
+    protected function signDocumentSignatories($documents, $signatory)
     {
-        $documentTypeIds = $this->signatoryDocumentTypes->findDocumentTypes(
-            $transaction->menu_id,
-            $transaction->currentSignatory->id
-        )->pluck('id');
-
-        $collection = collection();
-
-        $unsavedDocs = $transaction->documents->filter(function ($doc) {
-            return !$doc->exists;
-        });
-
-        $transaction->documents()->saveMany($unsavedDocs->all());
-
         foreach ($transaction->documents as $document) {
-            if (in_array($document->document_type_id, $documentTypeIds)) {
-                $collection[] = $this->documentApproval->firstOrCreate([
-                    'document_id'         => $document->id,
-                    'user_id'             => $signatory->getUser()->id,
-                    'job_id'              => $signatory->getUser()->job_id,
-                    'signatory_action_id' => $signatory->signatoryAction->id,
-                ]);
+            $documentSignatories = $document->documentSignatories->filter(function ($documentSignatory) use ($signatory) {
+                return $signatory->id == $documentSignatory->signatory_id;
+            });
+
+            foreach ($documentSignatories as $documentSignatory) {
+                $documentSignatory->is_signed = 1;
+                $documentSignatory->save(); // subject for optimization, use single update query
             }
         }
 
@@ -233,8 +209,14 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
 
         $transaction->save();
 
+        // TODO: move this in a better place
+        // $unsavedDocs = $transaction->documents->filter(function ($doc) {
+        //     return !$doc->exists;
+        // });
+        // $transaction->documents()->saveMany($unsavedDocs->all());
+
         $this->createTransactionApproval($transaction, $signatory, 'A', $remarks);
-        $this->createDocumentApprovals($transaction, $signatory);
+        $this->signDocumentSignatories($transaction->documents, $signatory);
 
         // Fire event for final approved of transaction
         if ($transaction->status === 'A') {

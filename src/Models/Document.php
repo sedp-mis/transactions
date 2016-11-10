@@ -21,8 +21,8 @@ class Document extends \Eloquent
         return $this->belongsTo(DocumentType::class);
     }
 
-    public function documentApprovals()
+    public function documentSignatories()
     {
-        return $this->hasMany(DocumentApproval::class);
+        return $this->hasMany(DocumentSignatory::class);
     }
 }

@@ -78,9 +78,9 @@ abstract class BaseDocumentController extends \Illuminate\Routing\Controller
             ->with(array_merge([
                 'branch',
                 'menu',
-                'documents.documentApprovals.signatoryAction',
-                'documents.documentApprovals.user',
-                'documents.documentApprovals.job',
+                'documents.documentSignatories.signatoryAction',
+                'documents.documentSignatories.user',
+                'documents.documentSignatories.job',
                 'documents.documentType',
                 'transactionApprovals',
             ], $this->eagerLoadWithTransaction))
