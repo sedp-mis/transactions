@@ -2,6 +2,7 @@
 
 namespace SedpMis\Transactions\Repositories\Signatory;
 
+use Illuminate\Support\Facades\DB;
 use SedpMis\BaseRepository\RepositoryInterface;
 use SedpMis\BaseRepository\BaseRepositoryEloquent;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -109,5 +110,33 @@ class SignatoryRepositoryEloquent extends BaseRepositoryEloquent implements Sign
         }
 
         return $signatorySet;
+    }
+
+    /**
+     * Find the documentType's signatories.
+     *
+     * @param  \SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
+     * @param  \Illuminate\Database\Eloquent\Collection $documentTypes
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function findDocumentTypeSignatories($transaction, $documentTypes)
+    {
+        $configs = DB::table('transaction_document_signatories')->where('menu_id', $transaction->menu_id)
+            ->whereIn('document_type_id', $documents->lists('document_type_id'))
+            ->get();
+
+        $signatories = $this->model->find($configs->lists('signatory_id'));
+
+        foreach ($signatories as $signatory) {
+            $documentTypeIds = $configs->filter(function ($config) use ($signatory) {
+                return $signatory->id == $config->signatory_id;
+            })->lists('document_type_id');
+
+            $signatory->setRelation('documentTypes', $documentTypes->filter(function ($documentType) use ($documentTypeIds) {
+                return in_array($documentType->id, $documentTypeIds);
+            }));
+        }
+
+        return $signatories;
     }
 }

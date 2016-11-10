@@ -2,7 +2,7 @@
 
 namespace SedpMis\Transactions\Models\Interfaces;
 
-interface DocumentApprovalInterface
+interface DocumentSignatoryInterface
 {
     /**
      * Signatory relation.

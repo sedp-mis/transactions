@@ -14,6 +14,7 @@ class ModelsProvider extends \Illuminate\Support\ServiceProvider
             'Signatory',
             'SignatorySet',
             'DocumentApproval',
+            'DocumentSignatory',
             'User',
             'Menu',
             'TransactionEventHandler',

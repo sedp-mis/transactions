@@ -52,4 +52,13 @@ interface SignatoryRepositoryInterface
      * @return \SedpMis\Transactions\Models\Interfaces\SignatorySetInterface
      */
     public function defaultReversalSignatorySet();
+
+    /**
+     * Find the documentType's signatories.
+     *
+     * @param  \SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
+     * @param  \Illuminate\Database\Eloquent\Collection $documentTypes
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function findDocumentTypeSignatories($transaction, $documentTypes);
 }
