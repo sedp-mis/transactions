@@ -100,7 +100,7 @@ class DocumentGenerator
      */
     public function generateDocumentSignatories($transaction, $documents)
     {
-        $signatories = $this->signatory->findDocumentTypeSignatories($transaction, $documents->pluck('documentType'));
+        $signatories = $this->signatory->findDocumentTypeSignatories($transaction, collection($documents->pluck('documentType')));
 
         $documentLists = $documents->groupBy('document_type_id');
 
