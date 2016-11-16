@@ -111,7 +111,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
 
         // Set relation currentUser (fk: current_user_id) if not set
         if (empty($transaction->currentUser)) {
-            $transaction->setRelation('currentUser', $signatory->getUser());
+            $transaction->setRelation('currentUser', $transaction->currentSignatory->getUser());
         }
 
         // Make sure to save fks
