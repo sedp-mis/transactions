@@ -127,7 +127,7 @@ class SignatoryRepositoryEloquent extends BaseRepositoryEloquent implements Sign
             ->where('signatories.signatory_set_id', $transaction->currentSignatory->signatory_set_id)
             ->get());
 
-        $signatories = $this->model->find(array_unique($configs->lists('signatory_id')))->orderBy('hierarchy');
+        $signatories = $this->model->orderBy('hierarchy')->find(array_unique($configs->lists('signatory_id')));
 
         foreach ($signatories as $signatory) {
             $documentTypeIds = $configs->filter(function ($config) use ($signatory) {
