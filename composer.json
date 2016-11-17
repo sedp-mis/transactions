@@ -11,7 +11,7 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "laravel/framework": "4.2.11",
+        "laravel/framework": "4.2.*",
         "sedp-mis/base-repository": "0.2.x-dev",
         "sedp-mis/base-api": "0.2.x-dev",
         "sedp-mis/lib": "2.*"
