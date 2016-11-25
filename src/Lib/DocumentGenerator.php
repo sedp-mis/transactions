@@ -77,19 +77,31 @@ class DocumentGenerator
 
         $documentTypes = $this->documentType->findByCode($documentTypeCodes);
 
+        return $this->generateByIds($transaction, $documentTypes->lists('id'));
+    }
+
+    /**
+     * Generate the document base on its ids.
+     *
+     * @param  \SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
+     * @param  array  $documentTypeIds
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function generateByIds($transaction, array $documentTypeIds)
+    {
         $documents = $this->document->newCollection();
 
-        foreach ($documentTypes as $documentType) {
+        foreach ($documentTypeIds as $documentTypeId) {
             $documents[] = $this->document->create([
                 'transaction_id'   => $transaction->id,
-                'document_type_id' => $documentType->id,
+                'document_type_id' => $documentTypeId,
             ]);
         }
 
         $this->generateDocumentSignatories($transaction, $documents);
 
         return $documents;
-    }
+    }    
 
     /**
      * Generate the documents signatories.
