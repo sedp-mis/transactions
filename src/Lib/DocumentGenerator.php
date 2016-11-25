@@ -65,7 +65,7 @@ class DocumentGenerator
     }
 
     /**
-     * Generate the documents for a transaction.
+     * Generate the documents for a transaction based on document type codes.
      *
      * @param  \SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
      * @param  array  $documentTypeCodes
@@ -101,7 +101,7 @@ class DocumentGenerator
         $this->generateDocumentSignatories($transaction, $documents);
 
         return $documents;
-    }    
+    }
 
     /**
      * Generate the documents signatories.
