@@ -121,6 +121,11 @@ class SignatoryRepositoryEloquent extends BaseRepositoryEloquent implements Sign
      */
     public function findDocumentTypeSignatories($transaction, $documentTypes)
     {
+        // If transaction has no currentSignatory, therefore there is no signatory for the documentTypes
+        if (!$transaction->currentSignatory) {
+            return collection();
+        }
+
         $configs = $this->model->newCollection(DB::table('transaction_document_signatories')->where('menu_id', $transaction->menu_id)
             ->leftJoin('signatories', 'signatories.id', '=', 'transaction_document_signatories.signatory_id')
             ->whereIn('document_type_id', array_unique($documentTypes->lists('id')))
