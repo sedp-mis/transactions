@@ -79,9 +79,8 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
      * Queue a transaction for approval.
      *
      * @param  array|\SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
-     * @return \SedpMis\Transactions\Models\Interfaces\TransactionInterface
-     *
      * @throws \InvalidArgumentException
+     * @return \SedpMis\Transactions\Models\Interfaces\TransactionInterface
      */
     public function queue($transaction)
     {

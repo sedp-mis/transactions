@@ -13,9 +13,8 @@ class DocumentLinkFactory
      * Return the document link instance for the document type.
      *
      * @param  \Illuminate\Database\Eloquent\Model $documentType
-     * @return \SedpMis\Transactions\Interfaces\DocumentLinkInteface
-     *
      * @throws \RuntimeException When document_link is not set
+     * @return \SedpMis\Transactions\Interfaces\DocumentLinkInteface
      */
     public function make($documentType)
     {
