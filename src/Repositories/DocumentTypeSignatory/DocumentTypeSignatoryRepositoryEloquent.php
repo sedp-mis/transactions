@@ -11,7 +11,7 @@ class DocumentTypeSignatoryRepositoryEloquent implements DocumentTypeSignatoryRe
 
     public function __construct()
     {
-        $this->signatory = App::make('\SedpMis\Transactions\Models\Interfaces\SignatoryInterface');
+        $this->signatory = App::make('SedpMis\Transactions\Models\Interfaces\SignatoryInterface');
     }
 
     public function findSignatoriesByTransaction($transaction, $documentTypes, $hierarchy = 1)
