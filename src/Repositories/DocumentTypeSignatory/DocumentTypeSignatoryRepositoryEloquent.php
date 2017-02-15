@@ -32,6 +32,10 @@ class DocumentTypeSignatoryRepositoryEloquent implements DocumentTypeSignatoryRe
             $q->whereIn('document_type_id', $documentTypeIds);
         }
 
-        return $this->signatory->find($q->lists('signatory_id'));
+        return $this->signatory->with([
+            'signatoryAction',
+            'user',
+            'job',
+        ])->find($q->lists('signatory_id'));
     }
 }
