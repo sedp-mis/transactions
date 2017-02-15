@@ -26,6 +26,11 @@ class ModelsProvider extends \Illuminate\Support\ServiceProvider
                 "SedpMis\\Transactions\\Models\\Interfaces\\{$model}Interface",
                 "{$this->modelNamespace}{$model}"
             );
+
+            $this->app->bind(
+                "\\SedpMis\\Transactions\\Models\\Interfaces\\{$model}Interface",
+                "{$this->modelNamespace}{$model}"
+            );
         }
     }
 }
