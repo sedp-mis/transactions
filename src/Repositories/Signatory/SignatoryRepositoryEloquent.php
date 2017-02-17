@@ -146,4 +146,26 @@ class SignatoryRepositoryEloquent extends BaseRepositoryEloquent implements Sign
 
         return $signatories;
     }
+
+    /**
+     * Find signatories of document types by menu.
+     *
+     * @param  int $menuId
+     * @param  array  $documentTypeIds
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function findSignatoriesByMenu($menuId, $documentTypeIds = [])
+    {
+        $q = DB::table('transaction_document_signatories')->where('menu_id', $menuId);
+
+        if ($documentTypeIds) {
+            $q->whereIn('document_type_id', $documentTypeIds);
+        }
+
+        return $this->model->with([
+            'signatoryAction',
+            'user',
+            'job',
+        ])->find($q->lists('signatory_id'));
+    }
 }

@@ -61,4 +61,13 @@ interface SignatoryRepositoryInterface
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public function findDocumentTypeSignatories($transaction, $documentTypes);
+
+    /**
+     * Find signatories of document types by menu.
+     *
+     * @param  int $menuId
+     * @param  array  $documentTypeIds
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function findSignatoriesByMenu($menuId, $documentTypeIds = []);
 }

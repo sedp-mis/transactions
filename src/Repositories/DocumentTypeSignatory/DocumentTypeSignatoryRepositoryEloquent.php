@@ -14,7 +14,8 @@ class DocumentTypeSignatoryRepositoryEloquent implements DocumentTypeSignatoryRe
         $this->signatory = App::make('SedpMis\Transactions\Models\Interfaces\SignatoryInterface');
     }
 
-    // Will be moved to signatory repository
+    // Deprecated.
+    // It is moved to signatory repository.
     public function findSignatoriesByMenu($menuId, $documentTypeIds = [])
     {
         $q = DB::table('transaction_document_signatories')->where('menu_id', $menuId);
