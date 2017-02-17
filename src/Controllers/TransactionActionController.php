@@ -6,7 +6,6 @@ use SedpMis\Transactions\Repositories\Transaction\TransactionRepositoryInterface
 use SedpMis\Transactions\Models\Interfaces\SignatoryInterface;
 use SedpMis\Transactions\Models\Interfaces\UserInterface;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use RuntimeException;
 
@@ -71,8 +70,6 @@ class TransactionActionController extends \Illuminate\Routing\Controller
      */
     public function action($transactionId, $action)
     {
-        DB::beginTransaction();
-
         $remarks = $this->request->input('remarks', '');
 
         $transaction = $this->transaction->with([
@@ -115,8 +112,6 @@ class TransactionActionController extends \Illuminate\Routing\Controller
         } elseif ($action == 'h') {
             $this->transaction->hold($transaction, $signatory, $remarks);
         }
-
-        DB::commit();
     }
 
     /**
