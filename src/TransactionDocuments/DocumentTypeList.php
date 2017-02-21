@@ -70,7 +70,20 @@ class DocumentTypeList implements DocumentListInterface
             $documentLists[] = $documentList;
         }
 
-        return $documentLists;
+        return $this->sortDocumentLists($documentLists);
+    }
+
+    /**
+     * Sort document lists.
+     *
+     * @param  \Illuminate\Database\Eloquent\Collection $documentLists
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function sortDocumentLists($documentLists)
+    {
+        return $documentLists->sortBy(function ($dl) {
+            return $dl->signatoryAction ? $dl->signatoryAction->name : 'z';
+        })->values();
     }
 
     /**
