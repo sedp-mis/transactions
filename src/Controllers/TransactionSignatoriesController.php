@@ -49,38 +49,6 @@ class TransactionSignatoriesController extends \Illuminate\Routing\Controller
             'currentSignatory',
         ])->findOrFail($transactionId);
 
-        $approvals = $transaction->transactionApprovals;
-
-        $signatories = collection();
-
-        if ($transaction->currentSignatory) {
-            $query = $this->signatory
-                ->with([
-                    'job',
-                    'user',
-                    'signatoryAction',
-                ])
-                ->where('signatory_set_id', $transaction->currentSignatory->signatory_set_id)
-                ->orderBy('hierarchy');
-
-            if ($approvals->count()) {
-                $query->where('hierarchy', '>', $approvals->last()->hierarchy);
-            }
-
-            $signatories = $query->get();
-
-            foreach ($signatories as $signatory) {
-                $signatory->setRelation('user', $signatory->getUser());
-                if (is_null($signatory->job_id) && $signatory->user_id) {
-                    $signatory->setRelation('job', $signatory->user->job);
-
-                    unset($signatory->user->job);
-                }
-            }
-        }
-
-        $approvals->addMany($signatories->all());
-
-        return $approvals;
+        return $transaction->transactionApprovals;
     }
 }
