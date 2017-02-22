@@ -33,20 +33,6 @@ interface TransactionInterface
     public function transactionApprovals();
 
     /**
-     * Current user signatory relation.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function currentUser();
-
-    /**
-     * Current signatory relation.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function currentSignatory();
-
-    /**
      * Reference transaction for reversal transaction.
      * Inverse of reversalTransactions.
      *
@@ -68,4 +54,27 @@ interface TransactionInterface
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function reversedByTransaction();
+
+    /**
+     * Get the current approval.
+     *
+     * @return \SedpMis\Transactions\Models\Interfaces\TransactionApprovalInterface
+     */
+    public function getCurrentApproval();
+
+    /**
+     * Get the next approval.
+     *
+     * @param  \SedpMis\Transactions\Models\Interfaces\TransactionApprovalInterface $approval
+     * @return \SedpMis\Transactions\Models\Interfaces\TransactionApprovalInterface
+     */
+    public function getNextApproval($approval = null);
+
+    /**
+     * Get the previous approval.
+     *
+     * @param  \SedpMis\Transactions\Models\Interfaces\TransactionApprovalInterface $approval
+     * @return \SedpMis\Transactions\Models\Interfaces\TransactionApprovalInterface
+     */
+    public function getPreviousApproval($approval = null);
 }

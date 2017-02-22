@@ -21,7 +21,8 @@ class Router
         Route::get('transactions/history', 'SedpMis\Transactions\Controllers\TransactionsController@history');
 
         Route::get('transactions/{transaction}', 'SedpMis\Transactions\Controllers\TransactionsController@show');
-        Route::get('transactions/{transaction}/signatories', 'SedpMis\Transactions\Controllers\TransactionSignatoriesController@index');
+        Route::get('transactions/{transaction}/signatories', 'SedpMis\Transactions\Controllers\TransactionApprovalsController@index');
+        Route::get('transactions/{transaction}/approvals', 'SedpMis\Transactions\Controllers\TransactionApprovalsController@index');
         Route::get('transactions/{transaction}/document_list', 'SedpMis\Transactions\Controllers\TransactionDocumentsController@documentList');
 
         Route::post('transactions/{transaction}/action/{action}', 'SedpMis\Transactions\Controllers\TransactionActionController@action');

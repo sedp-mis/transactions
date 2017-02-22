@@ -12,7 +12,7 @@ use SedpMis\BaseRepository\RepositoryInterface;
 use SedpMis\Transactions\EventHandlersListener;
 use SedpMis\Transactions\Models\SignatorySet;
 use Illuminate\Support\Facades\Event;
-use InvalidArgumentException;
+use RuntimeException;
 
 class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent implements RepositoryInterface, TransactionRepositoryInterface
 {
@@ -79,47 +79,73 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
      * Queue a transaction for approval.
      *
      * @param  array|\SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
+     * @param  int|\SedpMis\Transactions\Models\Interfaces\SignatorySetInterface $signatorySet
      * @throws \InvalidArgumentException
      * @return \SedpMis\Transactions\Models\Interfaces\TransactionInterface
      */
-    public function queue($transaction)
+    public function queue($transaction, $signatorySet = null)
     {
-        $transaction = is_array($transaction) ? $this->model->newInstance($transaction) : $transaction;
+        $transaction  = is_array($transaction) ? $this->model->newInstance($transaction) : $transaction;
+        $signatorySet = $signatorySet ?: $this->getSignatorySet($transaction);
 
         // Set default attributes
         foreach ($this->queueDefaultAttributes() as $attrib => $value) {
             $transaction->{$attrib} = $transaction->{$attrib} ?: $value;
         }
 
-        // Set the default reversal signatory set for reversal transaction.
-        if ($transaction->is_reversal && empty($transaction->currentSignatory)) {
-            $signatory = $this->signatory->defaultReversalSignatorySet()->signatories->first();
-
-            $transaction->setRelation('currentSignatory', $signatory);
-        }
-
-        // Set relation currentSignatory (fk: current_signatory_id) if not set
-        if (empty($transaction->currentSignatory)) {
-            if (empty($transaction->menu_id)) {
-                throw new InvalidArgumentException('Attribute menu_id does not exists in the given transaction. Cannot find signatorySet and currentSignatory');
-            }
-
-            $signatory = $this->menuSignatorySet->findSignatorySet($transaction->menu_id)->signatories->first();
-            $transaction->setRelation('currentSignatory', $signatory);
-        }
-
-        // Set relation currentUser (fk: current_user_id) if not set
-        if (empty($transaction->currentUser)) {
-            $transaction->setRelation('currentUser', $transaction->currentSignatory->getUser());
-        }
-
-        // Make sure to save fks
-        $transaction->current_signatory_id = $transaction->currentSignatory->id;
-        $transaction->current_user_id      = $transaction->currentUser->id;
+        $signatories = is_numeric($signatorySet) ? $this->signatory->findSignatoriesOfSignatorySet($signatorySet) : $signatorySet->signatories;
 
         $this->save($transaction);
 
+        $approvals = $this->createTransactionApprovals($transaction, $signatories);
+
+        $transaction->setRelation('transactionApprovals', $approvals);
+
         return $transaction;
+    }
+
+    /**
+     * Get the signatory set of transaction.
+     *
+     * @param  \SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
+     * @return \SedpMis\Transactions\Models\Interfaces\SignatorySetInterface
+     */
+    protected function getSignatorySet($transaction)
+    {
+        if (empty($transaction->menu_id)) {
+            throw new RuntimeException('Attribute menu_id does not exists in the given transaction. Cannot find signatorySet and signatories.');
+        }
+
+        // Get the default reversal signatory set for reversal transaction.
+        if ($transaction->is_reversal) {
+            return $this->signatory->defaultReversalSignatorySet();
+        }
+
+        return $this->menuSignatorySet->findSignatorySet($transaction->menu_id);
+    }
+
+    /**
+     * Create transaction approvals.
+     *
+     * @param  \SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
+     * @param  \Illuminate\Database\Eloquent\Collection $signatories
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function createTransactionApprovals($transaction, $signatories)
+    {
+        $approvals = collection();
+        foreach ($signatories as $signatory) {
+            $approvals[] = $this->transactionApproval->create([
+                'transaction_id'      => $transaction->id,
+                'signatory_id'        => $signatory->id,
+                'user_id'             => $signatory->getUser()->id,
+                'job_id'              => $signatory->getUser()->job_id,
+                'signatory_action_id' => $signatory->signatoryAction->id,
+                'hierarchy'           => $signatory->hierarchy,
+            ]);
+        }
+
+        return $approvals;
     }
 
     /**
@@ -140,14 +166,14 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
      * Sign document signatories.
      *
      * @param  \Illuminate\Database\Eloquent\Collection $documents
-     * @param  \SedpMis\Transactions\Models\Interfaces\SignatoryInterface $signatory
+     * @param  \SedpMis\Transactions\Models\Interfaces\TransactionApprovalInterface $approval
      * @return void
      */
-    protected function signDocumentSignatories($documents, $signatory)
+    protected function signDocumentSignatories($documents, $approval)
     {
         foreach ($documents as $document) {
-            $documentSignatories = $document->documentSignatories->filter(function ($documentSignatory) use ($signatory) {
-                return $signatory->id == $documentSignatory->signatory_id;
+            $documentSignatories = $document->documentSignatories->filter(function ($documentSignatory) use ($approval) {
+                return $approval->signatory_id == $documentSignatory->signatory_id;
             });
 
             foreach ($documentSignatories as $documentSignatory) {
@@ -158,46 +184,37 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     }
 
     /**
-     * Create transaction approvals.
+     * Perform transaction approval by the approver (approval).
      *
-     * @param  \SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
-     * @param  \SedpMis\Transactions\Models\Interfaces\SignatoryInterface $signatory
+     * @param  \SedpMis\Transactions\Models\Interfaces\TransactionApprovalInterface $approval
      * @param  string $action
      * @param  string $remarks
      * @return \SedpMis\Transactions\Models\Interfaces\TransactionApprovalInterface
      */
-    protected function createTransactionApproval($transaction, $signatory, $action, $remarks)
+    protected function performTransactionApproval($approval, $action, $remarks)
     {
-        return $this->transactionApproval->create([
-            'transaction_id'      => $transaction->id,
-            'signatory_id'        => $signatory->id,
-            'user_id'             => $signatory->getUser()->id,
-            'job_id'              => $signatory->getUser()->job_id,
-            'signatory_action_id' => $signatory->signatoryAction->id,
-            'status'              => $action,
-            'remarks'             => $remarks,
-        ]);
+        $approval->status       = $action;
+        $approval->remarks      = $remarks;
+        $approval->performed_at = date('Y-m-d H:i:s');
+        $approval->save();
     }
 
     /**
      * Accept a transaction by the currentSignatory.
      *
      * @param  \SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
-     * @param  \SedpMis\Transactions\Models\Interfaces\SignatoryInterface $signatory
+     * @param  \SedpMis\Transactions\Models\Interfaces\TransactionApprovalInterface $approval
      * @param  string $remarks
      * @return void
      */
-    public function accept($transaction, $signatory = null, $remarks = '')
+    public function accept($transaction, $approval = null, $remarks = '')
     {
-        $signatory = $signatory ?: $transaction->currentSignatory;
+        $approval = $approval ?: $transaction->getCurrentApproval();
 
-        $nextSignatory = $this->signatory->nextSignatory($signatory->id);
+        $nextApproval = $transaction->getNextApproval($approval);
 
-        if ($nextSignatory) {
-            $transaction->current_user_id      = $nextSignatory->getUser()->id;
-            $transaction->current_signatory_id = $nextSignatory->id;
-            $transaction->status               = 'Q';
-            $transaction->save();
+        if ($nextApproval) {
+            $transaction->status = 'Q';
         } else {
             $transaction->status        = 'A';
             $transaction->approved_at   = date('Y-m-d H:i:s');
@@ -206,14 +223,8 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
 
         $transaction->save();
 
-        // TODO: move this in a better place
-        // $unsavedDocs = $transaction->documents->filter(function ($doc) {
-        //     return !$doc->exists;
-        // });
-        // $transaction->documents()->saveMany($unsavedDocs->all());
-
-        $this->createTransactionApproval($transaction, $signatory, 'A', $remarks);
-        $this->signDocumentSignatories($transaction->documents, $signatory);
+        $this->performTransactionApproval($approval, 'A', $remarks);
+        $this->signDocumentSignatories($transaction->documents, $approval);
 
         // Fire event for final approved of transaction
         if ($transaction->status === 'A') {
@@ -232,24 +243,22 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     }
 
     /**
-     * Reject a transaction by the currentSignatory.
+     * Reject a transaction by the currentApproval.
      *
      * @param  \SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
-     * @param  \SedpMis\Transactions\Models\Interfaces\SignatoryInterface $signatory
+     * @param  \SedpMis\Transactions\Models\Interfaces\TransactionApprovalInterface $approval
      * @param  string $remarks
      * @return void
      */
-    public function reject($transaction, $signatory = null, $remarks = '')
+    public function reject($transaction, $approval = null, $remarks = '')
     {
-        $signatory = $signatory ?: $transaction->currentSignatory;
+        $approval = $approval ?: $transaction->getCurrentSignatory();
 
-        $transaction->current_signatory_id = $signatory->id;
-        $transaction->current_user_id      = $signatory->getUser()->id;
-        $transaction->status               = 'R';
-        $transaction->rejected_at          = date('Y-m-d H:i:s');
+        $transaction->status      = 'R';
+        $transaction->rejected_at = date('Y-m-d H:i:s');
         $transaction->save();
 
-        $this->createTransactionApproval($transaction, $signatory, 'R', $remarks);
+        $this->performTransactionApproval($approval, 'R', $remarks);
 
         // DO NOTHING ON THE REFERENCE TRANSACTION
         // Unhold reference transaction, bringing it back to queue.
@@ -272,23 +281,19 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
      * is via the ref_transaction_id (reversalTransactions relation, referenceTransaction is the inverse of relation).
      *
      * @param  \SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
-     * @param  \SedpMis\Transactions\Models\Interfaces\SignatoryInterface $signatory
+     * @param  \SedpMis\Transactions\Models\Interfaces\TransactionApprovalInterface $approval
      * @param  string $remarks
      * @return void
      */
-    public function hold($transaction, $signatory = null, $remarks = '')
+    public function hold($transaction, $approval = null, $remarks = '')
     {
-        $signatory = $signatory ?: $transaction->currentSignatory;
+        $approval = $approval ?: $transaction->getCurrentApproval();
 
         $transaction->status = 'Q';
-        if ($transaction->current_user_id != $signatory->getUser()->id) {
-            $transaction->current_user_id      = $signatory->getUser()->id;
-            $transaction->current_signatory_id = $signatory->id;
-        }
 
         $transaction->save();
 
-        $this->createTransactionApproval($transaction, $signatory, 'H', $remarks);
+        $this->performTransactionApproval($approval, 'H', $remarks);
     }
 
     /**

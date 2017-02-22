@@ -7,7 +7,6 @@ use SedpMis\Transactions\Models\Interfaces\SignatoryInterface;
 use SedpMis\Transactions\Models\Interfaces\UserInterface;
 use Illuminate\Support\Facades\App;
 use Illuminate\Http\Request;
-use RuntimeException;
 
 class TransactionActionController extends \Illuminate\Routing\Controller
 {
@@ -73,9 +72,7 @@ class TransactionActionController extends \Illuminate\Routing\Controller
         $remarks = $this->request->input('remarks', '');
 
         $transaction = $this->transaction->with([
-            'currentSignatory.signatoryAction',
-            'currentUser',
-            'lastTransactionApproval.signatoryAction',
+            'transactionApprovals.signatoryAction',
             ])->findOrFail($transactionId);
 
         $user = $this->user->find(get_user_session());
@@ -84,33 +81,21 @@ class TransactionActionController extends \Illuminate\Routing\Controller
             throw App::make('sedpmis-transaction.validation_exception', 'Cannot set action on transaction if user is not the current or previous user signatory.');
         }
 
-        // Assign the signatory that set an action to the transaction
-        $signatory = $transaction->currentSignatory;
-        $signatory->setRelation('user', $transaction->currentUser);
+        $approval = $transaction->getCurrentApproval();
 
-        // Set signatory to the previous user signatory
-        if ($transaction->current_user_id != $user->id) {
-            $signatory = $this->signatory->newInstance([
-                'user_id'             => $user->id,
-                'signatory_action_id' => $transaction->lastTransactionApproval->signatory_action_id,
-            ]);
-            $signatory->id = $transaction->lastTransactionApproval->signatory_id;
-            $signatory->setRelation('user', $user);
-            $signatory->setRelation('signatoryAction', $transaction->lastTransactionApproval->signatoryAction);
-        }
-
-        if (is_null($signatory->id)) {
-            throw new RuntimeException("Trying to {$this->actionToWord($action)} by a signatory which id is null, on transaction {$transactionId}.");
+        // Set approval to the previous user approval (Note: approval means the user approver)
+        if ($transaction->getPreviousApproval()->user_id != $user->id) {
+            $approval = $transaction->getPreviousApproval();
         }
 
         $action = $this->parseAction($action);
 
         if ($action == 'a') {
-            $this->transaction->accept($transaction, $signatory, $remarks);
+            $this->transaction->accept($transaction, $approval, $remarks);
         } elseif ($action == 'r') {
-            $this->transaction->reject($transaction, $signatory, $remarks);
+            $this->transaction->reject($transaction, $approval, $remarks);
         } elseif ($action == 'h') {
-            $this->transaction->hold($transaction, $signatory, $remarks);
+            $this->transaction->hold($transaction, $approval, $remarks);
         }
     }
 
@@ -123,17 +108,14 @@ class TransactionActionController extends \Illuminate\Routing\Controller
      */
     protected function isUserAllowedForAction($transaction, $user)
     {
-        if ($transaction->current_user_id != $user->id && is_null($transaction->lastTransactionApproval)) {
-            return false;
-        }
-
-        if ($transaction->current_user_id == $user->id) {
+        if (
+            $user->id == $transaction->getCurrentApproval()->user_id ||
+            $user->id == $transaction->getPreviousApproval()->user_id
+        ) {
             return true;
         }
 
-        return $transaction->current_user_id != $user->id &&
-            $transaction->lastTransactionApproval &&
-            $transaction->lastTransactionApproval->user_id == $user->id;
+        return false;
     }
 
     /**

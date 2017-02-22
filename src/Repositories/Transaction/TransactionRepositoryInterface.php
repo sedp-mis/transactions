@@ -7,10 +7,12 @@ interface TransactionRepositoryInterface
     /**
      * Queue a transaction for approval.
      *
-     * @param  array|\Transaction $transaction
-     * @return \Transaction
+     * @param  array|\SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
+     * @param  int|\SedpMis\Transactions\Models\Interfaces\SignatorySetInterface $signatorySet
+     * @throws \InvalidArgumentException
+     * @return \SedpMis\Transactions\Models\Interfaces\TransactionInterface
      */
-    public function queue($transaction);
+    public function queue($transaction, $signatorySet = null);
 
     /**
      * Accept a transaction by the currentSignatory.
