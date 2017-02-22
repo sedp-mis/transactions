@@ -3,7 +3,6 @@
 namespace SedpMis\Transactions\TransactionDocuments;
 
 use SedpMis\Transactions\Interfaces\DocumentListInterface;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Responsible for listing documents per document type.
@@ -57,9 +56,14 @@ class DocumentTypeList implements DocumentListInterface
             // Set relation models.
             $documentList->documentType = $documents->first()->documentType;
             $documentList->documents    = $documents;
+            $doc                        = $documents->first();
 
-            if ($this->isForSignatory($transaction->menu_id, $documentList->documentType->id, $transaction->currentSignatory->id)) {
-                $documentList->signatoryAction = $transaction->currentSignatory->signatoryAction;
+            $doc->load(['documentSignatories' => function ($q) use ($transaction) {
+                $q->where('signatory_id', $transaction->current_signatory_id);
+            }]);
+
+            if ($doc->documentSignatories->count()) {
+                $documentList->signatoryAction = $doc->documentSignatories->first()->signatoryAction;
             }
 
             $documentList->link = (new DocumentLinkFactory)->make($documentList->documentType)->link(
@@ -99,21 +103,5 @@ class DocumentTypeList implements DocumentListInterface
         }
 
         return $transaction->documents;
-    }
-
-    /**
-     * Identify whether if document type is for signatory under a certain menu.
-     *
-     * @param  int  $transactionMenuID
-     * @param  int  $documentTypeId
-     * @param  int  $signatoryId
-     * @return bool
-     */
-    protected function isForSignatory($transactionMenuID, $documentTypeId, $signatoryId)
-    {
-        return DB::table('transaction_document_signatories')
-            ->where('document_type_id', $documentTypeId)
-            ->where('signatory_id', $signatoryId)
-            ->count() > 0;
     }
 }
