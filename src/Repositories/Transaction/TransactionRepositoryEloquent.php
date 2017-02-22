@@ -201,6 +201,8 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         $approval->remarks      = $remarks;
         $approval->performed_at = date('Y-m-d H:i:s');
         $approval->save();
+
+        return $approval;
     }
 
     /**
