@@ -24,6 +24,20 @@ interface TransactionInterface
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function menu();
+    
+    /**
+     * Current user signatory relation.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function currentUser();
+
+    /**
+     * Current signatory relation.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function currentSignatory();
 
     /**
      * Transaction approvals relation.
