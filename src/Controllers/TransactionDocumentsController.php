@@ -46,7 +46,7 @@ class TransactionDocumentsController extends \Illuminate\Routing\Controller
     public function documentList($transactionId)
     {
         $transaction = $this->transaction->with([
-            'documents.documentType', 'documents.documentSignatories', 'menu.documentService',
+            'documents.documentType', 'documents', 'menu.documentService',
         ])->findOrFail($transactionId);
 
         return (new DocumentListFactory)->make($transaction->menu)->lists($transaction)->transform(function ($documentList) {
