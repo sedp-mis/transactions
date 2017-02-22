@@ -24,7 +24,7 @@ interface TransactionInterface
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function menu();
-    
+
     /**
      * Current user signatory relation.
      *

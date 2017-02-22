@@ -95,8 +95,9 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
 
         $signatories = is_numeric($signatorySet) ? $this->signatory->findSignatoriesOfSignatorySet($signatorySet) : $signatorySet->signatories;
 
-        // Set current user
-        $transaction->current_user_id = $signatories->first()->getUser()->id;
+        // Set current user signatory
+        $transaction->currentUser()->associate($signatories->first()->getUser());
+        $transaction->currentSignatory()->associate($signatories->first());
 
         $this->save($transaction);
 
@@ -218,8 +219,9 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
 
         if ($nextApproval) {
             $transaction->status = 'Q';
-            // Set next approver current user
-            $transaction->current_user_id = $nextApproval->user_id;
+            // Set next approver user signatory
+            $transaction->currentUser()->associate($nextApproval->user);
+            $transaction->currentSignatory()->associate($nextApproval->signatory);
         } else {
             $transaction->status        = 'A';
             $transaction->approved_at   = date('Y-m-d H:i:s');
