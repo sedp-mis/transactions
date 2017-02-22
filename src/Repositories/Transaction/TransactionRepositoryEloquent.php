@@ -334,7 +334,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         $query->where('transactions.status', 'Q');
         $query->whereIn(
             'transactions.id',
-            $this->transactionApproval->where('user_id', $userId)->whereNull('status')->lists('transaction_id') ?: [null]
+            $this->transactionApproval->where('user_id', $userId)->lists('transaction_id') ?: [null]
         );
 
         return $query->get($this->finalAttributes());
@@ -349,7 +349,10 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     public function getHistoricalTransactions($userId)
     {
         $query = $this->prepareQuery();
-        $query->whereIn('transactions.id', $this->transactionApproval->where('user_id', $userId)->lists('transaction_id') ?: [null]);
+        $query->whereIn(
+            'transactions.id',
+            $this->transactionApproval->where('user_id', $userId)->whereNull('status')->lists('transaction_id') ?: [null]
+        );
 
         return $query->get($this->finalAttributes());
     }
