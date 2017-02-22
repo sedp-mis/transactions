@@ -148,6 +148,18 @@ class SignatoryRepositoryEloquent extends BaseRepositoryEloquent implements Sign
     }
 
     /**
+     * Find signatories of signatory set.
+     *
+     * @param  int $signatorySetId
+     * @param  array $columns
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function findSignatoriesOfSignatorySet($signatorySetId, array $columns = ['*'])
+    {
+        return $this->model->where('signatory_set_id', $signatorySetId)->orderBy('hierarchy')->get($columns);
+    }
+
+    /**
      * Find signatories of document types by menu.
      *
      * @param  int $menuId

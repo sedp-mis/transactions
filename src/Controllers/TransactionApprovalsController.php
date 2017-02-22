@@ -3,9 +3,8 @@
 namespace SedpMis\Transactions\Controllers;
 
 use SedpMis\Transactions\Models\Interfaces\TransactionInterface;
-use SedpMis\Transactions\Models\Interfaces\SignatoryInterface;
 
-class TransactionSignatoriesController extends \Illuminate\Routing\Controller
+class TransactionApprovalsController extends \Illuminate\Routing\Controller
 {
     /**
      * Transaction model.
@@ -15,22 +14,13 @@ class TransactionSignatoriesController extends \Illuminate\Routing\Controller
     protected $transaction;
 
     /**
-     * Signatory model.
-     *
-     * @var \SedpMis\Transactions\Models\Interfaces\SignatoryInterface
-     */
-    protected $signatory;
-
-    /**
      * Construct.
      *
      * @param TransactionInterface $transaction
-     * @param SignatoryInterface   $signatory
      */
-    public function __construct(TransactionInterface $transaction, SignatoryInterface $signatory)
+    public function __construct(TransactionInterface $transaction)
     {
         $this->transaction = $transaction;
-        $this->signatory   = $signatory;
     }
 
     /**
@@ -46,7 +36,6 @@ class TransactionSignatoriesController extends \Illuminate\Routing\Controller
             'transactionApprovals.user',
             'transactionApprovals.job',
             'transactionApprovals.signatoryAction',
-            'currentSignatory',
         ])->findOrFail($transactionId);
 
         return $transaction->transactionApprovals;
