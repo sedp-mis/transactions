@@ -34,7 +34,7 @@ class TransactionApprovalsController extends \Illuminate\Routing\Controller
         $transaction = $this->transaction->with([
             'transactionApprovals.signatory',
             'transactionApprovals.user' => function ($q) {
-                $q->select('id', 'fname', 'mname', 'lname', 'bdate');
+                $q->select('id', 'fname', 'mname', 'lname');
             },
             'transactionApprovals.job',
             'transactionApprovals.signatoryAction',
