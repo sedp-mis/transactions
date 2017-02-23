@@ -84,7 +84,7 @@ class TransactionActionController extends \Illuminate\Routing\Controller
         $approval = $transaction->getCurrentApproval();
 
         // Set approval to the previous user approval (Note: approval means the user approver)
-        if ($transaction->getPreviousApproval()->user_id != $user->id) {
+        if ($transaction->getPreviousApproval()->user_id == $user->id) {
             $approval = $transaction->getPreviousApproval();
         }
 
