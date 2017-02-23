@@ -53,10 +53,7 @@ class TransactionsController extends \SedpMis\BaseApi\BaseApiController
      */
     public function approved()
     {
-        return $this->repo->filters([
-            'status' => 'A',
-        ])
-        ->get();
+        return $this->repo->getApprovedTransactions(get_user_session());
     }
 
     /**

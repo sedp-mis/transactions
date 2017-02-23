@@ -358,4 +358,22 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
 
         return $query->get($this->finalAttributes());
     }
+
+    /**
+     * Get approved transactions for the user.
+     *
+     * @param  int $userId
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getApprovedTransactions($userId)
+    {
+        $query = $this->prepareQuery();
+        $query->where('status', 'A');
+
+        if (function_exists('branch_assignment_array')) {
+            $query->whereIn('branch_id', branch_assignment_array($userId));
+        }
+
+        return $query->get($this->finalAttributes());
+    }
 }
