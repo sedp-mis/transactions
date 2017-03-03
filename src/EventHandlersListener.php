@@ -4,6 +4,7 @@ namespace SedpMis\Transactions;
 
 use Illuminate\Support\Facades\Event;
 use SedpMis\Transactions\Models\Interfaces\TransactionEventHandlerInterface;
+use SedpMis\Transactions\Interfaces\GlobalTransactionEventHandlersInterface;
 
 class EventHandlersListener
 {
@@ -27,13 +28,24 @@ class EventHandlersListener
     protected $transactionEventHandler;
 
     /**
+     * Global TransactionEventHandlers.
+     *
+     * @var \SedpMis\Transactions\Interfaces\GlobalTransactionEventHandlersInterface
+     */
+    protected $globalTransactionEventHandlers;
+
+    /**
      * Construct.
      *
      * @param TransactionEventHandlerInterface $transactionEventHandler
+     * @param GlobalTransactionEventHandlersInterface $globalTransactionEventHandlers
      */
-    public function __construct(TransactionEventHandlerInterface $transactionEventHandler)
-    {
-        $this->transactionEventHandler = $transactionEventHandler;
+    public function __construct(
+        TransactionEventHandlerInterface $transactionEventHandler,
+        GlobalTransactionEventHandlersInterface $globalTransactionEventHandlers
+    ) {
+        $this->transactionEventHandler        = $transactionEventHandler;
+        $this->globalTransactionEventHandlers = $globalTransactionEventHandlers;
     }
 
     /**
@@ -46,6 +58,8 @@ class EventHandlersListener
         $eventHandlers = $this->transactionEventHandler->with(['menus' => function ($query) {
             $query->select('menus.id', 'transaction_event_handler_id', 'name');
         }])->has('menus')->get();
+
+        $eventHandlers = $eventHandlers->merge($this->globalTransactionEventHandlers->getHandlers());
 
         foreach ($eventHandlers as $eventHandler) {
             foreach ($eventHandler->menus as $menu) {
