@@ -248,6 +248,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
             }
 
             Event::fire("transaction_approval.{$transaction->menu_id}.approved", [$transaction]);
+            Event::fire('transaction_approval.approved', [$transaction]);
         }
     }
 
@@ -280,6 +281,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
 
         // Fire event for rejected of transaction
         Event::fire("transaction_approval.{$transaction->menu_id}.rejected", [$transaction]);
+        Event::fire('transaction_approval.rejected', [$transaction]);
     }
 
     /**

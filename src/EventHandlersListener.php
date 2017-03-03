@@ -59,7 +59,7 @@ class EventHandlersListener
             $query->select('menus.id', 'transaction_event_handler_id', 'name');
         }])->has('menus')->get()->all();
 
-        $eventHandlers = array_merge($eventHandlers, $this->globalTransactionEventHandlers->getHandlers());
+        $globalEventHandlers = $this->globalTransactionEventHandlers->getHandlers();
 
         foreach ($eventHandlers as $eventHandler) {
             foreach ($eventHandler->menus as $menu) {
@@ -67,6 +67,14 @@ class EventHandlersListener
                     if (method_exists($eventHandler->class_path, $event)) {
                         Event::listen("transaction_approval.{$menu->id}.{$event}", "{$eventHandler->class_path}@{$event}", $eventHandler->priority);
                     }
+                }
+            }
+        }
+
+        foreach ($globalEventHandlers as $eventHandlerClass) {
+            foreach ($this->events as $event) {
+                if (method_exists($eventHandlerClass, $event)) {
+                    Event::listen("transaction_approval.{$event}", "{$eventHandlerClass}@{$event}");
                 }
             }
         }
