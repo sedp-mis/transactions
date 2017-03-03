@@ -57,9 +57,9 @@ class EventHandlersListener
     {
         $eventHandlers = $this->transactionEventHandler->with(['menus' => function ($query) {
             $query->select('menus.id', 'transaction_event_handler_id', 'name');
-        }])->has('menus')->get();
+        }])->has('menus')->get()->all();
 
-        $eventHandlers = $eventHandlers->merge($this->globalTransactionEventHandlers->getHandlers());
+        $eventHandlers = array_merge($eventHandlers, $this->globalTransactionEventHandlers->getHandlers());
 
         foreach ($eventHandlers as $eventHandler) {
             foreach ($eventHandler->menus as $menu) {
