@@ -6,6 +6,7 @@ use SedpMis\Transactions\Repositories\Signatory\SignatoryRepositoryInterface;
 use SedpMis\Transactions\Models\Interfaces\DocumentSignatoryInterface;
 use SedpMis\Transactions\Models\Interfaces\DocumentTypeInterface;
 use SedpMis\Transactions\Models\Interfaces\DocumentInterface;
+use RuntimeException;
 
 class DocumentGenerator
 {
@@ -76,6 +77,13 @@ class DocumentGenerator
         $documentTypeCodes = $documentTypeCodes ?: $this->documentTypeCodes;
 
         $documentTypes = $this->documentType->findByCode($documentTypeCodes);
+
+        $foundDocTypeCodes = $documentTypes->lists('code');
+
+        if ($documentTypeCodes != $foundDocTypeCodes) {
+            $documentTypeCodes = join(', ', array_diff($documentTypeCodes, $foundDocTypeCodes));
+            throw new RuntimeException("Some document type code does not exists: {$documentTypeCodes}.");
+        }
 
         return $this->generateByIds($transaction, $documentTypes->lists('id'));
     }
