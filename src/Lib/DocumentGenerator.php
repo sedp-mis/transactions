@@ -80,9 +80,11 @@ class DocumentGenerator
 
         $foundDocTypeCodes = $documentTypes->lists('code');
 
-        if ($documentTypeCodes != $foundDocTypeCodes) {
-            $documentTypeCodes = join(', ', array_diff($documentTypeCodes, $foundDocTypeCodes));
-            throw new RuntimeException("Some document type code does not exists: {$documentTypeCodes}.");
+        $diff = array_diff($documentTypeCodes, $foundDocTypeCodes);
+
+        if (!empty($diff)) {
+            $diffStr = join(', ', $diff);
+            throw new RuntimeException("Some document type code does not exists: {$diffStr}.");
         }
 
         return $this->generateByIds($transaction, $documentTypes->lists('id'));
