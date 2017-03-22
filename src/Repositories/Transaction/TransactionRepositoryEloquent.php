@@ -285,7 +285,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     }
 
     /**
-     * Hold a transaction by the currentSignatory.
+     * Hold a transaction by the current approval.
      * Be aware that a transaction can be hold by the system (not by signatory) in case there is a
      * transaction reversal for that transaction. In that case only status is set to H and has no record
      * in transaction approvals. The reference for that kind of transaction
