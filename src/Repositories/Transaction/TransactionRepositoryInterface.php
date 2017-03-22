@@ -15,6 +15,15 @@ interface TransactionRepositoryInterface
     public function queue($transaction, $signatorySet = null);
 
     /**
+     * Permanently cancel the transaction, making it void.
+     *
+     * @param  int|\SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
+     * @throws \RuntimeException A transaction can't be cancelled if an approval(approver) has signed or approved the transaction already
+     * @return \SedpMis\Transactions\Models\Interfaces\TransactionInterface
+     */
+    public function cancel($transaction);
+
+    /**
      * Accept a transaction by the currentSignatory.
      *
      * @param  \SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
@@ -33,6 +42,15 @@ interface TransactionRepositoryInterface
      * @return void
      */
     public function reject($transaction, $approval = null, $remarks = '');
+
+    /**
+     * Cancel the transaction approval action by the previous approval(approver).
+     *
+     * @param  int|\SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
+     * @param  int $userId
+     * @return \SedpMis\Transactions\Models\Interfaces\TransactionInterface
+     */
+    public function cancelApproval($transaction, $userId = null);
 
     /**
      * Hold a transaction by the current approval.

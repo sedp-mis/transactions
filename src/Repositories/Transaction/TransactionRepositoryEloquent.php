@@ -167,6 +167,59 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     }
 
     /**
+     * Permanently cancel the transaction, making it void.
+     *
+     * @param  int|\SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
+     * @throws \RuntimeException A transaction can't be cancelled if an approval(approver) has signed or approved the transaction already
+     * @return \SedpMis\Transactions\Models\Interfaces\TransactionInterface
+     */
+    public function cancel($transaction)
+    {
+        $transaction = is_scalar($transaction) ? $this->model->findOrFail($transaction) : $transaction;
+
+        $firstApproval = $transaction->getTransactionApprovals()->first();
+
+        // Status is already set, therefore action is already performed by the approver.
+        if (!$firstApproval->status) {
+            throw new RuntimeException("Transaction (id: {$transaction->id}) can't be cancelled. Action has already taken.");
+        }
+
+        $transaction->status       = 'C';
+        $transaction->cancelled_at = date('Y-m-d H:i:s');
+        $transaction->save();
+
+        return $transaction;
+    }
+
+    /**
+     * Cancel the transaction approval action by the previous approval(approver).
+     *
+     * @param  int|\SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
+     * @param  int $userId
+     * @return \SedpMis\Transactions\Models\Interfaces\TransactionInterface
+     */
+    public function cancelApproval($transaction, $userId = null)
+    {
+        $transaction      = is_scalar($transaction) ? $this->model->findOrFail($transaction) : $transaction;
+        $previousApproval = $transaction->getPreviousApproval();
+
+        if ($userId && $previousApproval->user_id != $userId) {
+            throw new RuntimeException('User is not the previous approver of the transaction. Cannot cancel approval.');
+        }
+
+        // Create new approval ready for re-approval.
+        $newPreviousApproval     = $previousApproval->newInstance($previousApproval->getAttributes());
+        $newPreviousApproval->id = null;
+        $newPreviousApproval->save();
+
+        // Cancel the approval
+        $previousApproval->cancelled_at = date('Y-m-d H:i:s');
+        $previousApproval->save();
+
+        return $transaction;
+    }
+
+    /**
      * Sign document signatories.
      *
      * @param  \Illuminate\Database\Eloquent\Collection $documents
@@ -198,7 +251,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     protected function performTransactionApproval($approval, $action, $remarks)
     {
         $approval->status       = $action;
-        $approval->remarks      = $remarks;
+        $approval->remarks      = $remarks ?: $approval->remarks;
         $approval->performed_at = date('Y-m-d H:i:s');
         $approval->save();
 
