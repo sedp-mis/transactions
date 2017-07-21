@@ -6,7 +6,6 @@ use SedpMis\Transactions\Repositories\Signatory\SignatoryRepositoryInterface;
 use SedpMis\Transactions\Models\Interfaces\TransactionApprovalInterface;
 use SedpMis\Transactions\Models\Interfaces\DocumentSignatoryInterface;
 use SedpMis\Transactions\Models\Interfaces\TransactionInterface;
-use SedpMis\Transactions\Interfaces\MenuSignatorySetInterface;
 use SedpMis\BaseRepository\BaseBranchRepositoryEloquent;
 use SedpMis\BaseRepository\RepositoryInterface;
 use SedpMis\Transactions\EventHandlersListener;
@@ -38,19 +37,11 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     protected $documentSignatory;
 
     /**
-     * Menu's signatorySet repository.
-     *
-     * @var \SedpMis\Transactions\Interfaces\MenuSignatorySetInterface
-     */
-    protected $menuSignatorySet;
-
-    /**
      * Construct.
      *
      * @param TransactionInterface            $model
      * @param SignatoryRepositoryInterface    $signatory
      * @param DocumentSignatoryInterface      $documentSignatory
-     * @param MenuSignatorySetInterface       $menuSignatorySet
      * @param EventHandlersListener           $eventHandlersListener
      * @param TransactionApprovalInterface    $transactionApproval
      */
@@ -58,15 +49,12 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         TransactionInterface $model,
         SignatoryRepositoryInterface $signatory,
         DocumentSignatoryInterface $documentSignatory,
-        MenuSignatorySetInterface $menuSignatorySet,
         EventHandlersListener $eventHandlersListener,
         TransactionApprovalInterface $transactionApproval
     ) {
         $this->model = $model;
 
         $this->signatory = $signatory;
-
-        $this->menuSignatorySet = $menuSignatorySet;
 
         $this->documentSignatory = $documentSignatory;
 
@@ -125,7 +113,16 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
             return $this->signatory->defaultReversalSignatorySet();
         }
 
-        return $this->menuSignatorySet->findSignatorySet($transaction->menu_id);
+        if ($transaction->menu->signatorySet) {
+            throw new RuntimeException("Menu {$transaction->menu->name} has no default signatory set. See `menus.signatory_set_id`.");
+        }
+
+        if ($transaction->menu->signatorySet->signatories->count() == 0) {
+            throw new RuntimeException("SignatorySet \"{$transaction->menu->signatorySet->name}\"".
+                "(id: {$transaction->menu->signatorySet->id}) has no signatories.");
+        }
+
+        return $transaction->menu->signatorySet;
     }
 
     /**
