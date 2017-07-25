@@ -113,7 +113,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
             return $this->signatory->defaultReversalSignatorySet();
         }
 
-        if ($transaction->menu->signatorySet) {
+        if (!$transaction->menu->signatorySet) {
             throw new RuntimeException("Menu {$transaction->menu->name} has no default signatory set. See `menus.signatory_set_id`.");
         }
 
