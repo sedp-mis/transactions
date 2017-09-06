@@ -134,19 +134,55 @@ class DocumentGenerator
                 return in_array($documentTypeId, $signatory->documentTypes->lists('id'));
             });
 
-            foreach ($documents as $document) {
-                foreach ($signatories as $signatory) {
-                    $documentSignatories[] = $this->documentSignatory->create([
-                        'document_id'         => $document->id,
-                        'signatory_id'        => $signatory->id,
-                        'user_id'             => $signatory->getUser()->id,
-                        'job_id'              => $signatory->getUser()->job_id,
-                        'signatory_action_id' => $signatory->signatoryAction->id,
-                    ]);
-                }
-            }
+            $documentSignatories = $documentSignatories->merge(
+                $this->createDocumentSignatories($documents, $signatories)
+            );
         }
 
         return $documentSignatories;
+    }
+
+    /**
+     * Create document signatories.
+     *
+     * @param  collection $documents
+     * @param  collection $signatories
+     * @return collection
+     */
+    public function createDocumentSignatories($documents, $signatories)
+    {
+        if (!is_collection($documents) && !is_array($documents)) {
+            $documents = [$documents];
+        }
+
+        $documentSignatories = collection();
+
+        foreach ($documents as $document) {
+            foreach ($signatories as $signatory) {
+                $documentSignatories[] = $this->documentSignatory->create([
+                    'document_id'         => $document->id,
+                    'signatory_id'        => $signatory->id,
+                    'user_id'             => $signatory->getUser()->id,
+                    'job_id'              => $signatory->getUser()->job_id,
+                    'signatory_action_id' => $signatory->signatoryAction->id,
+                ]);
+            }
+        }
+
+        $documentSignatories;
+    }
+
+    /**
+     * Create document signatories by signatory set.
+     *
+     * @param  collection $documents
+     * @param  collection $signatorySet
+     * @return collection
+     */
+    public function createDocumentSignatoriesBySet($documents, $signatorySet)
+    {
+        $signatories = is_numeric($signatorySet) ? $this->signatory->findSignatoriesOfSignatorySet($signatorySet) : $signatorySet->signatories;
+
+        return $this->createDocumentSignatories($documents, $signatories);
     }
 }
