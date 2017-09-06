@@ -169,7 +169,7 @@ class DocumentGenerator
             }
         }
 
-        $documentSignatories;
+        return $documentSignatories;
     }
 
     /**
