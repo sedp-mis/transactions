@@ -114,6 +114,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         }
 
         $signatorySet = $transaction->branch->non_branch ? $transaction->menu->nonBranchSignatorySet : $transaction->menu->signatorySet;
+        $signatorySet = is_null($signatorySet) ? $transaction->menu->signatorySet : $signatorySet;
 
         if (!$signatorySet) {
             throw new RuntimeException("Menu {$transaction->menu->name} has no default signatory set. See `menus.signatory_set_id` or `menus.non_branch_signatory_set_id`.");
