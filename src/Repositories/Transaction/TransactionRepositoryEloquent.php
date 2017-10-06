@@ -272,7 +272,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     {
         notify([
             'title' => "Pending Approval for <a href=''>{$transaction->menu->transaction_name}</a>",
-        ], $transaction->newCollection([$transaction->currentUser()]));
+        ], $transaction->newCollection([$transaction->currentUser]));
     }
 
     /**
