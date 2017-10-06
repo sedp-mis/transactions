@@ -270,9 +270,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
      */
     public function notifyAssignedApprover($transaction)
     {
-        notify([
-            'title' => "Pending Approval for <a href=''>{$transaction->menu->transaction_name}</a>",
-        ], $transaction->newCollection([$transaction->currentUser]));
+        notify((new Notification)->make($transaction), $transaction->newCollection([$transaction->currentUser]));
     }
 
     /**
