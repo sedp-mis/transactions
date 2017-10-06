@@ -21,7 +21,7 @@ class Notification
         }
 
         return [
-            'title' => "You have a pending Approval for <b>{$menuName}</b>.",
+            'title' => "You have a pending approval for <b>{$menuName}</b>.",
         ];
     }
 
