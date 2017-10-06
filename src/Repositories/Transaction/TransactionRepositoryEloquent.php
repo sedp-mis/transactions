@@ -89,7 +89,9 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
 
         $this->save($transaction);
 
-        $this->notifyAssignedApprover($transaction);
+        if ($transaction->status == 'Q') {
+            $this->notifyAssignedApprover($transaction);
+        }
 
         $approvals = $this->createTransactionApprovals($transaction, $signatories);
 
@@ -266,7 +268,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
      * @param  \SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
      * @return void
      */
-    protected function notifyAssignedApprover($transaction)
+    public function notifyAssignedApprover($transaction)
     {
         notify([
             'title' => "Pending Approval for <a href=''>{$transaction->menu->transaction_name}</a>",
