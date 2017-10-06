@@ -89,6 +89,8 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
 
         $this->save($transaction);
 
+        $this->notifyAssignedApprover($transaction);
+
         $approvals = $this->createTransactionApprovals($transaction, $signatories);
 
         $transaction->setRelation('transactionApprovals', $approvals);
@@ -259,6 +261,19 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     }
 
     /**
+     * Notify assigned approver.
+     *
+     * @param  \SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
+     * @return void
+     */
+    protected function notifyAssignedApprover($transaction)
+    {
+        notify([
+            'title' => "Pending Approval for <a href=''>{$transaction->menu->transaction_name}</a>",
+        ], $transaction->newCollection([$transaction->currentUser()]));
+    }
+
+    /**
      * Accept a transaction by the currentSignatory.
      *
      * @param  \SedpMis\Transactions\Models\Interfaces\TransactionInterface $transaction
@@ -284,6 +299,10 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         }
 
         $transaction->save();
+
+        if ($nextApproval) {
+            $this->notifyAssignedApprover($transaction);
+        }
 
         $this->performTransactionApproval($approval, 'A', $remarks);
         $this->signDocumentSignatories($transaction->documents, $approval);
