@@ -7,10 +7,12 @@ use SedpMis\Notifications\NotificationInterface;
 class NotificationApprovalPerformed implements NotificationInterface
 {
     public $transaction;
+    public $approval;
 
-    public function __construct($transaction)
+    public function __construct($transaction, $approval)
     {
         $this->transaction = $transaction;
+        $this->approval    = $approval;
     }
 
     public function make()
@@ -33,8 +35,10 @@ class NotificationApprovalPerformed implements NotificationInterface
 
     public function receivers()
     {
-        return $this->transaction->getPreviousApproval() && $this->transaction->getPreviousApproval()->user ?
-            collection([$this->transaction->getPreviousApproval()->user]) :
+        $previousApproval = $this->transaction->getPreviousApproval($this->approval);
+        
+        return $previousApproval && $previousApproval->user ? 
+            collection([$previousApproval->user]): 
             collection([$this->transaction->transactedBy]);
     }
 }

@@ -259,7 +259,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         $approval->performed_at = date('Y-m-d H:i:s');
         $approval->save();
 
-        $this->notifyApprovalPerformed($transaction);
+        $this->notifyApprovalPerformed($transaction, $approval);
 
         return $approval;
     }
@@ -275,9 +275,9 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         notify(new NotificationAssignedApprover($transaction));
     }
 
-    public function notifyApprovalPerformed($transaction)
+    public function notifyApprovalPerformed($transaction, $approval)
     {
-        notify((new NotificationApprovalPerformed($transaction)));
+        notify((new NotificationApprovalPerformed($transaction, $approval)));
     }
 
     /**
