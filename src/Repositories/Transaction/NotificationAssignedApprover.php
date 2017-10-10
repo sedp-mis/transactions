@@ -43,6 +43,6 @@ class NotificationAssignedApprover implements NotificationInterface
 
     public function receivers()
     {
-        return collection([$this->transaction->currentUser]);
+        return collection([$this->transaction->getCurrentApproval()->user]);
     }
 }
