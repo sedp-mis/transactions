@@ -28,7 +28,7 @@ class NotificationApprovalPerformed implements NotificationInterface
 
     private function actionPerformed()
     {
-        return $this->transaction->getCurrentApproval()->status == 'A' ? 'accepted' : 'rejected';
+        return $this->approval->status == 'A' ? 'accepted' : 'rejected';
     }
 
     public function receivers()
