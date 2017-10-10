@@ -259,6 +259,8 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         $approval->performed_at = date('Y-m-d H:i:s');
         $approval->save();
 
+        $this->notifyApprovalPerformed($transaction);
+
         return $approval;
     }
 
@@ -270,7 +272,12 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
      */
     public function notifyAssignedApprover($transaction)
     {
-        notify((new Notification)->make($transaction), $transaction->newCollection([$transaction->currentUser]));
+        notify((new NotificationAssignedApprover)->make($transaction), $transaction->newCollection([$transaction->currentUser]));
+    }
+
+    public function notifyApprovalPerformed($transaction)
+    {
+        notify((new NotificationApprovalPerformed)->make($transaction), $transaction->newCollection([$transaction->getPreviousApproval()]));
     }
 
     /**
@@ -285,6 +292,10 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     {
         $approval = $approval ?: $transaction->getCurrentApproval();
 
+        $this->performTransactionApproval($approval, 'A', $remarks);
+        $this->signDocumentSignatories($transaction->documents, $approval);
+
+        // Get and set next approval
         $nextApproval = $transaction->getNextApproval($approval);
 
         if ($nextApproval) {
@@ -303,9 +314,6 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         if ($nextApproval) {
             $this->notifyAssignedApprover($transaction);
         }
-
-        $this->performTransactionApproval($approval, 'A', $remarks);
-        $this->signDocumentSignatories($transaction->documents, $approval);
 
         // Fire event for final approved of transaction
         if ($transaction->status === 'A') {

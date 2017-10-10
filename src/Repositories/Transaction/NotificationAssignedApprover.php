@@ -2,7 +2,7 @@
 
 namespace SedpMis\Transactions\Repositories\Transaction;
 
-class Notification
+class NotificationAssignedApprover
 {
     public $transaction;
 
@@ -12,11 +12,11 @@ class Notification
 
         $menuName = $transaction->menu->transaction_name ?: $transaction->menu->name;
 
-        $sender = $this->getSender();
+        $from = $this->getFromUser();
 
-        if ($sender) {
+        if ($from) {
             return [
-                'title' => "<b>{$sender->full_name_2}</b> endorsed a transaction <b>{$menuName}</b> for your approval.",
+                'title' => "<b>{$from->full_name_2}</b> endorsed a transaction <b>{$menuName}</b> for your approval.",
             ];
         }
 
@@ -25,7 +25,7 @@ class Notification
         ];
     }
 
-    public function getSender()
+    public function getFromUser()
     {
         $approver = $this->transaction->transactionApprovals->sortByDesc('hierarchy')->first(function ($approval) {
             return $approval->status == 'A';
