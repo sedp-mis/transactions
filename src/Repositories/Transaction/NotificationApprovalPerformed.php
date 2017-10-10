@@ -33,10 +33,14 @@ class NotificationApprovalPerformed implements NotificationInterface
 
     public function receivers()
     {
-        $previousApproval = $this->transaction->getPreviousApproval($this->approval);
+        $users = collection([$this->transaction->transactedBy]);
 
-        return $previousApproval && $previousApproval->user ? 
-            collection([$previousApproval->user]): 
-            collection([$this->transaction->transactedBy]);
+        $approvals = $this->transaction->getTransactionApprovals()->filter(function ($approval) {
+            return !empty($approval->status) && $approval->id != $this->approval->id;
+        });
+
+        return $users->addMany($approvals->map(function ($approval) {
+            return $approval->user;
+        }));
     }
 }
