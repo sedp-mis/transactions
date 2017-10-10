@@ -252,7 +252,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
      * @param  string $remarks
      * @return \SedpMis\Transactions\Models\Interfaces\TransactionApprovalInterface
      */
-    protected function performTransactionApproval($approval, $action, $remarks)
+    protected function performTransactionApproval($transaction, $approval, $action, $remarks)
     {
         $approval->status       = $action;
         $approval->remarks      = $remarks ?: $approval->remarks;
@@ -292,7 +292,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
     {
         $approval = $approval ?: $transaction->getCurrentApproval();
 
-        $this->performTransactionApproval($approval, 'A', $remarks);
+        $this->performTransactionApproval($transaction, $approval, 'A', $remarks);
         $this->signDocumentSignatories($transaction->documents, $approval);
 
         // Get and set next approval
@@ -348,7 +348,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         $transaction->rejected_at = date('Y-m-d H:i:s');
         $transaction->save();
 
-        $this->performTransactionApproval($approval, 'R', $remarks);
+        $this->performTransactionApproval($transaction, $approval, 'R', $remarks);
 
         // DO NOTHING ON THE REFERENCE TRANSACTION
         // Unhold reference transaction, bringing it back to queue.
@@ -384,7 +384,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
 
         $transaction->save();
 
-        $this->performTransactionApproval($approval, 'H', $remarks);
+        $this->performTransactionApproval($transaction, $approval, 'H', $remarks);
     }
 
     /**
