@@ -207,7 +207,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         $transaction      = is_scalar($transaction) ? $this->model->findOrFail($transaction) : $transaction;
         $previousApproval = $transaction->getPreviousApproval();
 
-        if ($userId && $previousApproval->user_id != $userId) {
+        if (is_null($previousApproval) || $userId && $previousApproval->user_id != $userId) {
             throw new RuntimeException('User is not the previous approver of the transaction. Cannot cancel approval.');
         }
 

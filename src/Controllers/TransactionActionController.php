@@ -110,6 +110,7 @@ class TransactionActionController extends \Illuminate\Routing\Controller
     {
         if (
             $user->id == $transaction->getCurrentApproval()->user_id ||
+            $transaction->getPreviousApproval() &&
             $user->id == $transaction->getPreviousApproval()->user_id
         ) {
             return true;
