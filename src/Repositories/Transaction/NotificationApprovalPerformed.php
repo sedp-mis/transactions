@@ -21,6 +21,6 @@ class NotificationApprovalPerformed
 
     public function actionPerformed()
     {
-        return $transaction->getCurrentApproval()->status == 'A' ? 'accepted' : 'rejected';
+        return $this->transaction->getCurrentApproval()->status == 'A' ? 'accepted' : 'rejected';
     }
 }
