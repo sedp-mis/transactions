@@ -21,10 +21,8 @@ class NotificationApprovalPerformed implements NotificationInterface
 
         $menuName = $transaction->menu->transaction_name ?: $transaction->menu->name;
 
-        $currentUser = $transaction->getCurrentApproval()->user;
-
         return [
-            'title' => "<strong>{$currentUser->full_name_2}</strong> {$this->actionPerformed()} your endorsed transaction for <strong>{$menuName}</strong>.",
+            'title' => "<strong>{$this->approval->user->full_name_2}</strong> {$this->actionPerformed()} your endorsed transaction for <strong>{$menuName}</strong>.",
         ];
     }
 
@@ -36,7 +34,7 @@ class NotificationApprovalPerformed implements NotificationInterface
     public function receivers()
     {
         $previousApproval = $this->transaction->getPreviousApproval($this->approval);
-        
+
         return $previousApproval && $previousApproval->user ? 
             collection([$previousApproval->user]): 
             collection([$this->transaction->transactedBy]);
