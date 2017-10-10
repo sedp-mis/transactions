@@ -34,12 +34,8 @@ class NotificationAssignedApprover implements NotificationInterface
 
     public function getFromUser()
     {
-        $approver = $this->transaction->transactionApprovals->sortByDesc('hierarchy')->first(function ($approval) {
-            return $approval->status == 'A';
-        });
-
-        if ($approver) {
-            return $approver;
+        if ($this->transaction->getPreviousApproval() && $this->transaction->getPreviousApproval()->user) {
+            return $this->transaction->getPreviousApproval()->user;
         }
 
         return $this->transaction->transactedBy;
