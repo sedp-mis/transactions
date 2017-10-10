@@ -272,12 +272,12 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
      */
     public function notifyAssignedApprover($transaction)
     {
-        notify((new NotificationAssignedApprover)->make($transaction), $transaction->newCollection([$transaction->currentUser]));
+        notify(new NotificationAssignedApprover($transaction));
     }
 
     public function notifyApprovalPerformed($transaction)
     {
-        notify((new NotificationApprovalPerformed)->make($transaction), $transaction->newCollection([$transaction->getPreviousApproval() ?: $transaction->transactedBy]));
+        notify((new NotificationApprovalPerformed($transaction)));
     }
 
     /**

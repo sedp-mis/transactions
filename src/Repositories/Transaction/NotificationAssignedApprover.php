@@ -2,13 +2,20 @@
 
 namespace SedpMis\Transactions\Repositories\Transaction;
 
-class NotificationAssignedApprover
+use SedpMis\Notifications\NotificationInterface;
+
+class NotificationAssignedApprover implements NotificationInterface
 {
     public $transaction;
 
-    public function make($transaction)
+    public function __construct($transaction)
     {
         $this->transaction = $transaction;
+    }
+
+    public function make()
+    {
+        $transaction = $this->transaction;
 
         $menuName = $transaction->menu->transaction_name ?: $transaction->menu->name;
 
@@ -35,6 +42,11 @@ class NotificationAssignedApprover
             return $approver;
         }
 
-        return $transaction->transactedBy;
+        return $this->transaction->transactedBy;
+    }
+
+    public function receivers()
+    {
+        return collection([$this->transaction->currentUser]);
     }
 }
