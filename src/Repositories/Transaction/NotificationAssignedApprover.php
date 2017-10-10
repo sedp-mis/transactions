@@ -24,6 +24,7 @@ class NotificationAssignedApprover implements NotificationInterface
         if ($from) {
             return [
                 'title' => "<b>{$from->full_name_2}</b> endorsed a transaction <b>{$menuName}</b> for your approval.",
+                'redirect_link' => '/#transaction_approval',
             ];
         }
 
