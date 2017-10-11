@@ -89,13 +89,13 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
 
         $this->save($transaction);
 
-        if ($transaction->status == 'Q') {
-            $this->notifyAssignedApprover($transaction);
-        }
-
         $approvals = $this->createTransactionApprovals($transaction, $signatories);
 
         $transaction->setRelation('transactionApprovals', $approvals);
+
+        if ($transaction->status == 'Q') {
+            $this->notifyAssignedApprover($transaction);
+        }
 
         return $transaction;
     }
