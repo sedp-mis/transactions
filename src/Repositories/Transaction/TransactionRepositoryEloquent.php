@@ -280,8 +280,10 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
 
     public function doNotify($notification)
     {
+        $notification     = is_array($notification) ? $notification : [$notification];
+
         $this->dontNotify = array_filter($this->dontNotify, function ($notif) use ($notification) {
-            return $notif != $notification;
+            return !in_array($notif, $notification);
         });
 
         return $this;
