@@ -36,6 +36,8 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
      */
     protected $documentSignatory;
 
+    protected $dontNotify = [];
+
     /**
      * Construct.
      *
@@ -264,6 +266,27 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         return $approval;
     }
 
+    public function dontNotify($notification, $replace = true)
+    {
+        if ($replace) {
+            $this->dontNotify = [];
+        }
+
+        $notification     = is_array($notification) ? $notification : [$notification];
+        $this->dontNotify = array_merge($this->dontNotify, $notification);
+
+        return $this;
+    }
+
+    public function doNotify($notification)
+    {
+        $this->dontNotify = array_filter($this->dontNotify, function ($notif) use ($notification) {
+            return $notif != $notification;
+        });
+
+        return $this;
+    }
+
     /**
      * Notify assigned approver.
      *
@@ -272,11 +295,19 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
      */
     public function notifyAssignedApprover($transaction)
     {
+        if (in_array('assigned_approver', $this->dontNotify)) {
+            return;
+        }
+
         notify(new NotificationAssignedApprover($transaction));
     }
 
     public function notifyApprovalPerformed($transaction, $approval)
     {
+        if (in_array('approval_performed', $this->dontNotify)) {
+            return;
+        }
+
         notify((new NotificationApprovalPerformed($transaction, $approval)));
     }
 
