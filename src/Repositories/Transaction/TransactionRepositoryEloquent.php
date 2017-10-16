@@ -9,9 +9,11 @@ use SedpMis\Transactions\Models\Interfaces\TransactionInterface;
 use SedpMis\BaseRepository\BaseBranchRepositoryEloquent;
 use SedpMis\BaseRepository\RepositoryInterface;
 use SedpMis\Transactions\EventHandlersListener;
+use SedpMis\BaseGridQuery\Search\SublimeSearch;
 use SedpMis\Transactions\Models\SignatorySet;
 use Illuminate\Support\Facades\Event;
 use RuntimeException;
+use Input;
 
 class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent implements RepositoryInterface, TransactionRepositoryInterface
 {
@@ -280,7 +282,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
 
     public function doNotify($notification)
     {
-        $notification     = is_array($notification) ? $notification : [$notification];
+        $notification = is_array($notification) ? $notification : [$notification];
 
         $this->dontNotify = array_filter($this->dontNotify, function ($notif) use ($notification) {
             return !in_array($notif, $notification);
@@ -469,7 +471,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
             $this->transactionApproval->where('user_id', $userId)->whereNotNull('status')->lists('transaction_id') ?: [null]
         );
 
-        $query->orWhere('transactions.transacted_by_user_id', $userId);
+        // $query->orWhere('transactions.transacted_by_user_id', $userId);
 
         return $query->get($this->finalAttributes());
     }
@@ -489,6 +491,35 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
             $query->whereIn('branch_id', branch_assignment_array($userId));
         }
 
-        return $query->get($this->finalAttributes());
+        return $query->get();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function prepareQuery()
+    {
+        $query = parent::prepareQuery()
+            ->leftJoin('menus', 'menus.id', '=', 'transactions.menu_id');
+
+        $search = Input::get('search');
+        $search = isset($search['input']) ? $search['input'] : '';
+
+        return (new SublimeSearch(
+            $query,
+            ['menus.name', 'menus.transaction_name', 'transactions.remarks'],
+            true,
+            [],
+            'where'
+        ))->search($search)
+        ->select('transactions.*');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function querySearch($query)
+    {
+        return $query;
     }
 }
