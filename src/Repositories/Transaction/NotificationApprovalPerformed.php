@@ -22,7 +22,7 @@ class NotificationApprovalPerformed implements NotificationInterface
         $menuName = $transaction->menu->transaction_name ?: $transaction->menu->name;
 
         return [
-            'title' => "<strong>{$this->approval->user->full_name_2}</strong> {$this->actionPerformed()} your endorsed transaction for <strong>{$menuName}</strong>.",
+            'title' => "<strong>{$this->approval->user->full_name_2}</strong> {$this->actionPerformed()} your endorsed transaction for <strong>{$menuName}</strong> ({$transaction->remarks}).",
         ];
     }
 
