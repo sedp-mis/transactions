@@ -453,6 +453,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
             'transactions.id',
             $this->transactionApproval->where('user_id', $userId)->lists('transaction_id') ?: [null]
         );
+        $query->where('transactions.current_user_id', '!=', $userId);
 
         return $query->get($this->finalAttributes());
     }
