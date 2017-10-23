@@ -472,6 +472,8 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
             $this->transactionApproval->where('user_id', $userId)->whereNotNull('status')->lists('transaction_id') ?: [null]
         );
 
+        $query->orWhere('transactions.transacted_by_user_id', \Auth::user()->id);
+
         // $query->orWhere('transactions.transacted_by_user_id', $userId);
 
         return $query->get($this->finalAttributes());
