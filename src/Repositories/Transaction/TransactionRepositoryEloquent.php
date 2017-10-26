@@ -341,7 +341,9 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         } else {
             $transaction->status        = 'A';
             $transaction->approved_at   = date('Y-m-d H:i:s');
-            $transaction->transacted_at = $transaction->transacted_at ?: $transaction->approved_at;
+            $transaction->transacted_at = $transaction->transacted_at ? 
+                carbon($transaction->transacted_at)->format('Y-m-d H:i:s') : 
+                $transaction->approved_at;
         }
 
         $transaction->save();
