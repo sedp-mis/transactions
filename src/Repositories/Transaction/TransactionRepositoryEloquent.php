@@ -512,7 +512,7 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
 
         return (new SublimeSearch(
             $query,
-            ['menus.name', 'menus.transaction_name', 'transactions.remarks'],
+            ['menus.name', 'menus.transaction_name', 'transactions.id', 'transactions.remarks'],
             true,
             [],
             'where'
