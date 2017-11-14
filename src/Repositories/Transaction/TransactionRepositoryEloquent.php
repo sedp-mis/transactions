@@ -457,6 +457,8 @@ class TransactionRepositoryEloquent extends BaseBranchRepositoryEloquent impleme
         );
         $query->where('transactions.current_user_id', '!=', $userId);
 
+        $query->orWhere('transactions.transacted_by_user_id', \Auth::user()->id);
+
         return $query->get($this->finalAttributes());
     }
 
